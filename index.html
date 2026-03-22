@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMD Rack System — NTPC NKSTPP</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1a2235;--surface:#1e2d45;--surface2:#243352;--accent:#00d4aa;--accent2:#0099ff;--accent3:#ff6b35;--amber:#f59e0b;--red:#ef4444;--green:#22c55e;--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--border:rgba(255,255,255,0.07);--border2:rgba(0,212,170,0.3);--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;--r:8px;--r2:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;height:100%}
+.shell{display:grid;grid-template-rows:56px 1fr;grid-template-columns:230px 1fr;height:100vh;min-height:600px}
+.topbar{grid-column:1/-1;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:10}
+.topbar-logo{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:.05em;font-weight:700}
+.topbar-div{width:1px;height:20px;background:var(--border)}
+.topbar-title{font-size:13px;color:var(--text2);flex:1}
+.topbar-badge{font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(0,212,170,.1);color:var(--accent);border:1px solid rgba(0,212,170,.25)}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding:12px 0}
+.sid-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--text3);padding:10px 12px 4px;text-transform:uppercase}
+.sid-sec{padding:0 10px 6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:var(--r);cursor:pointer;transition:all .15s;font-size:13px;color:var(--text2)}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(0,212,170,.1);color:var(--accent);border-left:2px solid var(--accent)}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.main{overflow-y:auto;background:var(--bg)}
+.panel{display:none;padding:24px;animation:fadeIn .2s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.ph{margin-bottom:20px}.ph h1{font-family:var(--mono);font-size:16px;color:var(--text);font-weight:700;margin-bottom:3px}.ph p{font-size:12px;color:var(--text2)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:14px}
+.sv{font-family:var(--mono);font-size:24px;font-weight:700;line-height:1;margin-bottom:5px}
+.sl{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
+.ss{font-size:10px;color:var(--text3);margin-top:3px}
+.ca{color:var(--accent)}.cb{color:var(--accent2)}.cam{color:var(--amber)}.cr{color:var(--red)}.cg{color:var(--green)}.co{color:var(--accent3)}
+.tw{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:18px}
+.th{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.th h3{font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+.tsearch{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:5px 10px;color:var(--text);font-family:var(--sans);font-size:12px;width:190px;outline:none}
+.tsearch:focus{border-color:var(--accent2)}.tsearch::placeholder{color:var(--text3)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead th{padding:9px 12px;text-align:left;background:var(--bg3);color:var(--text2);font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{color:var(--accent)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface2)}
+tbody tr.uhf-row{background:rgba(0,153,255,.06)}
+tbody tr.uhf-row:hover{background:rgba(0,153,255,.12)}
+tbody td{padding:8px 12px;color:var(--text);vertical-align:middle}
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.05em}
+.bg{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+.ba{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.25)}
+.br{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.bb{background:rgba(0,153,255,.12);color:var(--accent2);border:1px solid rgba(0,153,255,.25)}
+.bt{background:rgba(0,212,170,.1);color:var(--accent);border:1px solid var(--border2)}
+.bpu{background:rgba(168,85,247,.12);color:#a855f7;border:1px solid rgba(168,85,247,.25)}
+.pg{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--text2)}
+.pgb{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:4px 11px;border-radius:var(--r);cursor:pointer;font-size:11px;transition:all .15s}
+.pgb:hover{border-color:var(--accent);color:var(--accent)}.pgb:disabled{opacity:.3;cursor:not-allowed}
+.rack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:20px}
+.rack-unit{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.ru-hdr{background:var(--bg3);padding:9px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ru-hdr h4{font-family:var(--mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+.ru-slots{padding:7px;display:flex;flex-direction:column;gap:3px}
+.slot{display:flex;align-items:center;gap:9px;padding:6px 9px;border-radius:5px;border:1px solid var(--border);font-size:11px;cursor:pointer;transition:all .15s}
+.slot:hover{border-color:var(--accent2);background:var(--surface2)}
+.slot.uhf-slot{background:rgba(0,153,255,.05)}
+.snum{font-family:var(--mono);font-size:9px;color:var(--text3);width:26px;flex-shrink:0}
+.sled{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.led-h{background:var(--green);box-shadow:0 0 5px var(--green)}.led-m{background:var(--amber);box-shadow:0 0 5px var(--amber)}.led-l{background:var(--text3)}
+.sname{flex:1;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srat{font-family:var(--mono);font-size:9px;color:var(--text3);flex-shrink:0}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:26px;max-width:560px;width:92%;max-height:80vh;overflow-y:auto}
+.modal h2{font-family:var(--mono);font-size:14px;color:var(--accent);margin-bottom:3px}
+.modal-sub{font-size:11px;color:var(--text2);margin-bottom:18px}
+.pg2{display:grid;grid-template-columns:130px 1fr;gap:7px 14px;font-size:12px}
+.pk{color:var(--text3);font-family:var(--mono);font-size:10px;padding-top:1px}.pv{color:var(--text)}
+.mc{margin-top:18px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:7px 18px;border-radius:var(--r);cursor:pointer;font-family:var(--sans);font-size:12px;transition:all .15s}
+.mc:hover{border-color:var(--accent);color:var(--accent)}
+.ai-panel{display:flex;flex-direction:column;height:calc(100vh - 56px)}
+.ai-msgs{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px}
+.msg{display:flex;gap:10px;align-items:flex-start;animation:fadeIn .2s ease}
+.mav{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:700;flex-shrink:0}
+.mav.ai{background:rgba(0,212,170,.15);color:var(--accent);border:1px solid var(--border2)}
+.mav.user{background:rgba(0,153,255,.15);color:var(--accent2);border:1px solid rgba(0,153,255,.3)}
+.mb{background:var(--surface);border:1px solid var(--border);border-radius:0 var(--r2) var(--r2) var(--r2);padding:11px 14px;font-size:12px;line-height:1.65;max-width:700px}
+.msg.user .mb{background:var(--surface2);border-radius:var(--r2) 0 var(--r2) var(--r2)}
+.msg.user{flex-direction:row-reverse}
+.ai-input-wrap{border-top:1px solid var(--border);padding:14px 18px;display:flex;gap:9px;background:var(--bg2)}
+.ai-input{flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:9px 13px;font-family:var(--sans);font-size:12px;outline:none;resize:none}
+.ai-input:focus{border-color:var(--accent)}
+.ai-send{background:rgba(0,212,170,.15);border:1px solid var(--border2);color:var(--accent);padding:9px 16px;border-radius:var(--r);cursor:pointer;font-family:var(--mono);font-size:11px;transition:all .15s;white-space:nowrap}
+.ai-send:hover{background:rgba(0,212,170,.25)}
+.chips{display:flex;flex-wrap:wrap;gap:7px;padding:0 18px 10px}
+.chip{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:4px 11px;border-radius:20px;font-size:11px;cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.td-dot{width:5px;height:5px;border-radius:50%;display:inline-block;margin-right:4px}
+.tdef{display:flex;align-items:center;gap:3px}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.tdot{width:5px;height:5px;border-radius:50%;background:var(--text3);animation:bounce 1.2s infinite;display:inline-block}
+.tdot:nth-child(2){animation-delay:.2s}.tdot:nth-child(3){animation-delay:.4s}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:18px}
+.fg label{display:block;font-size:10px;color:var(--text2);margin-bottom:4px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em}
+.fg input,.fg select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 11px;font-family:var(--sans);font-size:12px;outline:none;transition:border-color .15s}
+.fg input:focus,.fg select:focus{border-color:var(--accent)}
+.fg select option{background:var(--bg2)}
+.btn{background:rgba(0,212,170,.15);border:1px solid var(--border2);color:var(--accent);padding:8px 18px;border-radius:var(--r);cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:.05em;transition:all .15s}
+.btn:hover{background:rgba(0,212,170,.25)}
+.sep{border:none;border-top:1px solid var(--border);margin:18px 0}
+.itag{display:inline-flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:3px 9px;font-size:11px;margin:2px}
+.xbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.xbtn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:5px 12px;border-radius:var(--r);cursor:pointer;font-size:11px;transition:all .15s}
+.xbtn:hover{border-color:var(--accent2);color:var(--accent2)}
+.sb-banner{background:var(--bg3);border-left:3px solid var(--text3);padding:6px 12px;font-size:10px;color:var(--text3);font-family:var(--mono);font-style:italic}
+.uhf-banner{background:rgba(0,153,255,.08);border-left:3px solid var(--accent2);padding:6px 12px;font-size:10px;color:var(--accent2);font-family:var(--mono);font-style:italic}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:3px}
+.mb strong{color:var(--accent);font-weight:500}
+.mb code{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:1px 4px;font-family:var(--mono);font-size:10px;color:var(--accent2)}
+.mb ul{padding-left:14px;margin-top:5px}.mb li{margin-bottom:2px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <span class="topbar-logo">EMD-RACK</span>
+    <div class="topbar-div"></div>
+    <span class="topbar-title">NTPC North Karanpura — Electrical Maintenance Department  |  Rev 2  |  Mar 2026</span>
+    <span class="topbar-badge">DGM: M.K. Mitra</span>
+  </div>
+
+  <div class="sidebar">
+    <div class="sid-label">Inventory</div>
+    <div class="sid-sec">
+      <div class="nav-item active" onclick="nav('dashboard')"><span class="dot" style="background:var(--accent)"></span>Dashboard</div>
+      <div class="nav-item" onclick="nav('motors')"><span class="dot" style="background:var(--accent2)"></span>Motors (35 items)</div>
+      <div class="nav-item" onclick="nav('brakes')"><span class="dot" style="background:var(--amber)"></span>Brakes (39 items)</div>
+      <div class="nav-item" onclick="nav('control')"><span class="dot" style="background:var(--accent3)"></span>Control Comps (64 items)</div>
+      <div class="nav-item" onclick="nav('auxiliary')"><span class="dot" style="background:var(--green)"></span>Auxiliary (29 items)</div>
+    </div>
+    <div class="sid-label">Views</div>
+    <div class="sid-sec">
+      <div class="nav-item" onclick="nav('rack')"><span class="dot" style="background:var(--red)"></span>Rack View</div>
+      <div class="nav-item" onclick="nav('procurement')"><span class="dot" style="background:var(--amber)"></span>Procurement Summary</div>
+    </div>
+    <div class="sid-label">Tools</div>
+    <div class="sid-sec">
+      <div class="nav-item" onclick="nav('ai')"><span class="dot" style="background:var(--accent)"></span>AI Technical Expert</div>
+      <div class="nav-item" onclick="nav('rca')"><span class="dot" style="background:var(--amber)"></span>RCA Generator</div>
+      <div class="nav-item" onclick="nav('pr')"><span class="dot" style="background:var(--green)"></span>Procurement Tool</div>
+    </div>
+  </div>
+
+  <div class="main" id="main">
+
+    <!-- DASHBOARD -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="ph"><h1>// Overview Dashboard</h1><p>NTPC NKSTPP — EMD Electrical Spares Procurement Plan Rev 2 | Both Sources</p></div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="sv ca">162</div><div class="sl">Total Line Items</div><div class="ss">Both Sources Combined</div></div>
+        <div class="stat-card"><div class="sv cb">297</div><div class="sl">Pop. Installed</div><div class="ss">Across all equipment</div></div>
+        <div class="stat-card"><div class="sv ca">199</div><div class="sl">Spare Qty Rec.</div><div class="ss">Recommended stock</div></div>
+        <div class="stat-card"><div class="sv cr">88</div><div class="sl">HIGH Priority</div><div class="ss">Procure 30–60 days</div></div>
+        <div class="stat-card"><div class="sv cam">53</div><div class="sl">MEDIUM Priority</div><div class="ss">Procure 90–120 days</div></div>
+        <div class="stat-card"><div class="sv cg">21</div><div class="sl">LOW Priority</div><div class="ss">Buffer / Quarterly</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px">
+        <div class="tw">
+          <div class="th"><h3>Category Summary</h3></div>
+          <table>
+            <thead><tr><th>Category</th><th>Items</th><th>Pop.</th><th>Spare</th><th>H</th><th>M</th><th>L</th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge cb">MOTORS</span></td><td>35</td><td>47</td><td>35</td><td style="color:var(--red)">14</td><td style="color:var(--amber)">16</td><td style="color:var(--green)">5</td></tr>
+              <tr><td><span class="badge ba">BRAKES</span></td><td>39</td><td>65</td><td>39</td><td style="color:var(--red)">18</td><td style="color:var(--amber)">15</td><td style="color:var(--green)">6</td></tr>
+              <tr><td><span class="badge bt">CONTROL</span></td><td>59</td><td>130</td><td>70</td><td style="color:var(--red)">36</td><td style="color:var(--amber)">16</td><td style="color:var(--green)">7</td></tr>
+              <tr><td><span class="badge bg">AUXILIARY</span></td><td>29</td><td>55</td><td>55</td><td style="color:var(--red)">20</td><td style="color:var(--amber)">6</td><td style="color:var(--green)">3</td></tr>
+              <tr style="background:var(--bg3)"><td><strong style="color:var(--accent);font-size:10px">GRAND TOTAL</strong></td><td style="font-family:var(--mono);color:var(--accent)">162</td><td style="font-family:var(--mono)">297</td><td style="font-family:var(--mono)">199</td><td style="color:var(--red);font-family:var(--mono)">88</td><td style="color:var(--amber);font-family:var(--mono)">53</td><td style="color:var(--green);font-family:var(--mono)">21</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tw">
+          <div class="th"><h3>Equipment Areas</h3></div>
+          <table>
+            <thead><tr><th>Equipment</th><th>Area</th><th>Source</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>10t DG Gantry</td><td style="font-size:10px;color:var(--text2)">Raw Water PH</td><td><span class="badge bt">NTPC</span></td><td><span class="badge bg">ACTIVE</span></td></tr>
+              <tr><td>15t DG EOT</td><td style="font-size:10px;color:var(--text2)">Intake Well</td><td><span class="badge bt">NTPC</span></td><td><span class="badge bg">ACTIVE</span></td></tr>
+              <tr><td>15t CEP Under-Slung</td><td style="font-size:10px;color:var(--text2)">CEP Indoor</td><td><span class="badge bt">NTPC</span></td><td><span class="badge bg">ACTIVE</span></td></tr>
+              <tr><td>2–7.5t Monorail</td><td style="font-size:10px;color:var(--text2)">APH/FOPH/SCAPH</td><td><span class="badge bt">NTPC</span></td><td><span class="badge bg">ACTIVE</span></td></tr>
+              <tr><td>17.5t/20t TWH</td><td style="font-size:10px;color:var(--text2)">ID/PAFD Fan</td><td><span class="badge bt">NTPC</span></td><td><span class="badge bg">ACTIVE</span></td></tr>
+              <tr><td>25t USC-001 ×2</td><td style="font-size:10px;color:var(--text2)">Mill Crane</td><td><span class="badge bb">UHF</span></td><td><span class="badge bg">ACTIVE</span></td></tr>
+              <tr><td>25t USC-002 ×10</td><td style="font-size:10px;color:var(--text2)">Mill Crane</td><td><span class="badge bb">UHF</span></td><td><span class="badge bg">ACTIVE</span></td></tr>
+              <tr><td>25t EH-003 ×2</td><td style="font-size:10px;color:var(--text2)">Mill/ID Fan</td><td><span class="badge bb">UHF</span></td><td><span class="badge bg">ACTIVE</span></td></tr>
+              <tr><td>1t EH-012 ×2</td><td style="font-size:10px;color:var(--text2)">Aux Light Duty</td><td><span class="badge bb">UHF</span></td><td><span class="badge ba">MONITOR</span></td></tr>
+              <tr><td>35t Consolidated</td><td style="font-size:10px;color:var(--text2)">FD/PA/ID/FOPH</td><td><span class="badge bt">NTPC</span></td><td><span class="badge bb">STANDBY</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tw">
+        <div class="th"><h3>Priority Legend & Standards</h3></div>
+        <div style="padding:12px 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+          <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--r);padding:10px"><div style="font-family:var(--mono);font-size:10px;color:var(--red);margin-bottom:4px">★ HIGH — Safety Critical</div><div style="font-size:10px;color:var(--text2)">Procure within 30–60 days. Zero stock = plant risk.</div></div>
+          <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:var(--r);padding:10px"><div style="font-family:var(--mono);font-size:10px;color:var(--amber);margin-bottom:4px">★ MEDIUM — Operational Risk</div><div style="font-size:10px;color:var(--text2)">Procure 90–120 days. Maintain 1 unit in store.</div></div>
+          <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:var(--r);padding:10px"><div style="font-family:var(--mono);font-size:10px;color:var(--green);margin-bottom:4px">★ LOW — Consumable/Wear</div><div style="font-size:10px;color:var(--text2)">Buffer stock. Local market / NTPC AVL.</div></div>
+        </div>
+        <div style="padding:10px 14px;display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid var(--border)">
+          <span class="itag"><span style="color:var(--accent2)">▸</span>IE Rules</span><span class="itag"><span style="color:var(--accent2)">▸</span>CEA Regulations</span><span class="itag"><span style="color:var(--accent2)">▸</span>NTPC Safety Policy</span><span class="itag"><span style="color:var(--accent2)">▸</span>LOTO/PTW</span><span class="itag"><span style="color:var(--accent2)">▸</span>HIRA/JSA</span><span class="itag"><span style="color:var(--accent2)">▸</span>Arc Flash PPE</span><span class="itag"><span style="color:var(--accent2)">▸</span>TEFC IP55 Standard</span><span class="itag"><span style="color:var(--accent2)">▸</span>Class F Insulation</span><span class="itag"><span style="color:var(--accent2)">▸</span>S4 Duty Cycle</span><span class="itag"><span style="color:var(--accent2)">▸</span>415V 3-Ph 50Hz</span><span class="itag"><span style="color:var(--accent2)">▸</span>UHF OEM Compliance</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOTORS -->
+    <div class="panel" id="panel-motors">
+      <div class="ph"><h1>// Motor Database</h1><p>35 motor entries — Source 1: NTPC TDS/BOM + Source 2: UHF Mill Crane Package</p></div>
+      <div class="xbar">
+        <button class="xbtn" onclick="mFilter('')">All</button>
+        <button class="xbtn" onclick="mFilter('MH')">Hoist (MH)</button>
+        <button class="xbtn" onclick="mFilter('CT')">Cross Travel (CT)</button>
+        <button class="xbtn" onclick="mFilter('LT')">Long Travel (LT)</button>
+        <button class="xbtn" onclick="mFilter('HIGH')">HIGH Priority</button>
+        <button class="xbtn" onclick="mFilter('UHF')">UHF Only</button>
+        <button class="xbtn" onclick="exportCSV('motors')">↓ Export CSV</button>
+      </div>
+      <div class="tw">
+        <div class="th"><h3>Motor Registry</h3><input class="tsearch" id="msrch" placeholder="Search motors..." oninput="renderMotors()"></div>
+        <div style="overflow-x:auto"><table><thead><tr><th onclick="sortM('sno')">No↕</th><th onclick="sortM('eq')">Equipment↕</th><th>App / Area</th><th onclick="sortM('type')">Type↕</th><th onclick="sortM('kw')">kW↕</th><th>Voltage</th><th>Poles/RPM</th><th>Duty</th><th>Frame</th><th>Pop.</th><th>Make</th><th>Spare</th><th>Priority</th><th>Remarks</th></tr></thead><tbody id="mtbody"></tbody></table></div>
+        <div class="pg"><span id="mcnt" style="font-size:11px;color:var(--text3)"></span><div style="display:flex;gap:7px"><button class="pgb" id="mprev" onclick="mPage(-1)">← Prev</button><span id="mpg" style="font-size:11px;padding:0 8px;color:var(--text2)"></span><button class="pgb" id="mnext" onclick="mPage(1)">Next →</button></div></div>
+      </div>
+    </div>
+
+    <!-- BRAKES -->
+    <div class="panel" id="panel-brakes">
+      <div class="ph"><h1>// Brake Systems</h1><p>39 brake entries — DC EM Disc · AC EM Disc · AC EHT | Source 1 + UHF</p></div>
+      <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card"><div class="sv ca">DC EM</div><div class="sl">Disc Brakes</div><div class="ss">Rectifier fed, fail-safe</div></div>
+        <div class="stat-card"><div class="sv cb">AC EM</div><div class="sl">EM Disc Brakes</div><div class="ss">Monorail, TWH & UHF</div></div>
+        <div class="stat-card"><div class="sv cam">AC EHT</div><div class="sl">Electro-Hydraulic</div><div class="ss">Gantry, EOT cranes</div></div>
+        <div class="stat-card"><div class="sv co">150%</div><div class="sl">MH Service Factor</div><div class="ss">Full load torque req.</div></div>
+      </div>
+      <div class="tw">
+        <div class="th"><h3>Brake Registry</h3><input class="tsearch" id="bsrch" placeholder="Search brakes..." oninput="renderBrakes()"></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>No</th><th>Equipment</th><th>Application</th><th>Brake Type</th><th>Cat.</th><th>Size</th><th>Torque(kg.m)</th><th>Service Factor</th><th>Pop.</th><th>Make</th><th>Spare</th><th>Priority</th><th>Remarks</th></tr></thead><tbody id="btbody"></tbody></table></div>
+        <div class="pg"><span id="bcnt" style="font-size:11px;color:var(--text3)"></span><div style="display:flex;gap:7px"><button class="pgb" id="bprev" onclick="bPage(-1)">← Prev</button><span id="bpg" style="font-size:11px;padding:0 8px;color:var(--text2)"></span><button class="pgb" id="bnext" onclick="bPage(1)">Next →</button></div></div>
+      </div>
+    </div>
+
+    <!-- CONTROL -->
+    <div class="panel" id="panel-control">
+      <div class="ph"><h1>// Control Panel Components</h1><p>64 entries — Isolators · Contactors · VFDs · OL Relays · Limit Switches · Pendants · E-Stops</p></div>
+      <div class="tw">
+        <div class="th"><h3>Control Component Registry</h3><input class="tsearch" id="csrch" placeholder="Search components..." oninput="renderControl()"></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>No</th><th>Equipment</th><th>Application</th><th>Component</th><th>Rating</th><th>Voltage</th><th>Cat.</th><th>Pop.</th><th>Make</th><th>Spare</th><th>Priority</th><th>Remarks</th></tr></thead><tbody id="ctbody"></tbody></table></div>
+        <div class="pg"><span id="ccnt" style="font-size:11px;color:var(--text3)"></span><div style="display:flex;gap:7px"><button class="pgb" id="cprev" onclick="cPage(-1)">← Prev</button><span id="cpg" style="font-size:11px;padding:0 8px;color:var(--text2)"></span><button class="pgb" id="cnext" onclick="cPage(1)">Next →</button></div></div>
+      </div>
+    </div>
+
+    <!-- AUXILIARY -->
+    <div class="panel" id="panel-auxiliary">
+      <div class="ph"><h1>// Auxiliary & Drive Components</h1><p>29 entries — Rectifiers · DBRs · DSL System · Festoon Cables · UHF Interlock · Radio Remote</p></div>
+      <div class="tw">
+        <div class="th"><h3>Auxiliary Component Registry</h3><input class="tsearch" id="asrch" placeholder="Search auxiliary..." oninput="renderAux()"></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>No</th><th>Equipment</th><th>Application</th><th>Component</th><th>Rating</th><th>Voltage/Supply</th><th>Pop.</th><th>Make</th><th>Spare</th><th>Priority</th><th>Remarks</th></tr></thead><tbody id="atbody"></tbody></table></div>
+        <div class="pg"><span id="acnt" style="font-size:11px;color:var(--text3)"></span><div style="display:flex;gap:7px"><button class="pgb" id="aprev" onclick="aPage(-1)">← Prev</button><span id="apg" style="font-size:11px;padding:0 8px;color:var(--text2)"></span><button class="pgb" id="anext" onclick="aPage(1)">Next →</button></div></div>
+      </div>
+    </div>
+
+    <!-- RACK VIEW -->
+    <div class="panel" id="panel-rack">
+      <div class="ph"><h1>// Visual Rack View</h1><p>Component slot-by-slot layout per crane/hoist assembly. Blue rows = UHF Mill Crane additions.</p></div>
+      <div class="rack-grid" id="rack-container"></div>
+    </div>
+
+    <!-- PROCUREMENT SUMMARY -->
+    <div class="panel" id="panel-procurement">
+      <div class="ph"><h1>// Procurement Summary</h1><p>Rev 2 | Mar 2026 | Consolidated Vendor Shortlist & Priority Action Plan</p></div>
+      <div class="tw" style="margin-bottom:16px">
+        <div class="th"><h3>Priority-wise Action Plan</h3></div>
+        <div style="padding:14px">
+          <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--r);padding:12px;margin-bottom:10px">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--red);margin-bottom:5px">HIGH — Safety Critical → Procure within 30–60 days</div>
+            <div style="font-size:11px;color:var(--text2)">Hoist motors (9.3kW/15kW), EM brakes, brake rectifiers, VFDs (Yaskawa V1000), contactors, limit switches, E-Stop buttons, FSUs (32A/63A/100A), DBRs, DSL SFU, UHF crane interlock assemblies (IMM-009/IMF-010), RRC sets, pendant stations (cable wear = common fault)</div>
+          </div>
+          <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:var(--r);padding:12px;margin-bottom:10px">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--amber);margin-bottom:5px">MEDIUM — Operational Risk → Procure within 90–120 days</div>
+            <div style="font-size:11px;color:var(--text2)">CT/LT motors, CT brakes, control transformers (SE/Kappa for UHF / Sekappa for NTPC), OL relays, isolation switches, festoon cable clamps, rope clamps, elevator hoist motors</div>
+          </div>
+          <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:var(--r);padding:12px">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--green);margin-bottom:5px">LOW — Consumable/Wear → Buffer Stock / Quarterly</div>
+            <div style="font-size:11px;color:var(--text2)">Terminal blocks (Elmex brand for UHF), indicator lamps, cable glands (M16–M40 assorted, double-compression for UHF), cable lugs & ferrules (1.5–35mm²), earthing bus bars</div>
+          </div>
+        </div>
+      </div>
+      <div class="tw">
+        <div class="th"><h3>Consolidated Vendor Shortlist</h3></div>
+        <table>
+          <thead><tr><th>Component Category</th><th>Primary NTPC Approved Vendors</th><th>Procurement Notes</th></tr></thead>
+          <tbody id="vendor-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- AI EXPERT -->
+    <div class="panel" id="panel-ai" style="padding:0">
+      <div class="ai-panel">
+        <div class="ai-msgs" id="ai-msgs">
+          <div class="msg"><div class="mav ai">AI</div><div class="mb"><strong>EMD Technical Expert — Online</strong><br><br>Namaste, Manash Kumar Mitra sir. I am your AI technical consultant for NTPC NKSTPP Electrical Maintenance.<br><br>I have full context of your Rev 2 procurement plan — all 162 line items across motors, brakes, control components, and auxiliary systems, including the UHF Mill Crane package (USC-001×2, USC-002×10, EH-003×2, EH-012×2), Yaskawa V1000 VFDs, Conductix DSL system, festoon cables, IMM-009/IMF-010 interlocks, and all NTPC safety protocols.<br><br>Ask me anything: VFD fault diagnosis, RCA, brake troubleshooting, motor sizing, LOTO procedures, DBT scripts, or procurement justifications.</div></div>
+        </div>
+        <div class="chips">
+          <span class="chip" onclick="sendQ('Yaskawa V1000 OC fault on 15t CEP crane MH drive — troubleshoot step by step')">V1000 OC Fault</span>
+          <span class="chip" onclick="sendQ('RCA for DC EM disc brake failure on 12t SG crane vacuum pump area')">RCA: Brake Failure</span>
+          <span class="chip" onclick="sendQ('Motor IR test procedure for 9.3kW 415V TEFC motor before energisation')">Motor IR Test</span>
+          <span class="chip" onclick="sendQ('LOTO procedure for replacing 22A contactor in monorail hoist control panel')">LOTO — Contactor</span>
+          <span class="chip" onclick="sendQ('UHF EH-003 hoist load relay 50-80A tripped — what are the possible causes?')">EH-003 Load Relay Trip</span>
+          <span class="chip" onclick="sendQ('Conductix DSL bus-bar system: common faults and maintenance checklist for 25t mill cranes')">DSL System Faults</span>
+          <span class="chip" onclick="sendQ('Write a Daily Toolbox Talk for festoon cable replacement on 25t USC-002 mill crane')">DBT: Festoon Cable</span>
+          <span class="chip" onclick="sendQ('AC EHT brake maintenance checklist for 10t gantry crane — thruster oil level, air gap, coil check')">EHT Brake Maintenance</span>
+        </div>
+        <div class="ai-input-wrap">
+          <textarea class="ai-input" id="ai-inp" rows="2" placeholder="Ask any electrical engineering question... (Enter to send, Shift+Enter for new line)"></textarea>
+          <button class="ai-send" onclick="sendAI()">Send ↗</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RCA GENERATOR -->
+    <div class="panel" id="panel-rca">
+      <div class="ph"><h1>// RCA Generator</h1><p>Root Cause Analysis — NTPC Template A format</p></div>
+      <div class="tw" style="padding:18px">
+        <div class="th" style="padding:0 0 10px"><h3>New RCA Report</h3></div>
+        <div class="fgrid">
+          <div class="fg"><label>Equipment Name</label><input id="r-eq" placeholder="e.g. 15t DG EOT Crane MH Motor"></div>
+          <div class="fg"><label>Tag Number</label><input id="r-tag" placeholder="e.g. CR-01-MH-001"></div>
+          <div class="fg"><label>Incident Date</label><input id="r-date" type="date"></div>
+          <div class="fg"><label>Failure Type</label><select id="r-type"><option>Motor Failure</option><option>Brake Failure</option><option>VFD/Drive Trip</option><option>Contactor Failure</option><option>Limit Switch Failure</option><option>OL Relay Trip</option><option>Cable Fault</option><option>Rectifier Failure</option><option>DSL/Festoon Fault</option><option>UHF Interlock Failure</option><option>Other</option></select></div>
+          <div class="fg" style="grid-column:1/-1"><label>Problem Statement</label><input id="r-prob" placeholder="Describe the failure clearly..."></div>
+          <div class="fg" style="grid-column:1/-1"><label>Initial Observations</label><input id="r-obs" placeholder="Abnormal sound, heat, smell, vibration, tripping..."></div>
+          <div class="fg"><label>Generation Impact</label><input id="r-imp" placeholder="kW / downtime hours"></div>
+          <div class="fg"><label>Safety Incident?</label><select id="r-saf"><option>No Safety Incident</option><option>Near Miss</option><option>Minor Injury</option><option>PTW Violation</option></select></div>
+        </div>
+        <button class="btn" onclick="genRCA()">Generate RCA Report ↗</button>
+      </div>
+      <div id="rca-out" style="margin-top:18px"></div>
+    </div>
+
+    <!-- PROCUREMENT TOOL -->
+    <div class="panel" id="panel-pr">
+      <div class="ph"><h1>// Procurement Justification</h1><p>Template B — NTPC/PSU Technical Procurement Justification</p></div>
+      <div class="tw" style="padding:18px">
+        <div class="th" style="padding:0 0 10px"><h3>New Procurement Request</h3></div>
+        <div class="fgrid">
+          <div class="fg" style="grid-column:1/-1"><label>Material Description</label><input id="p-mat" placeholder="Exact technical name and specifications..."></div>
+          <div class="fg"><label>Target Asset</label><select id="p-asset"><option>10t DG Gantry Crane (Raw Water PH)</option><option>15t DG EOT Crane (Intake Well)</option><option>15t CEP Under-Slung Crane</option><option>12t SG Under-Slung Crane</option><option>2t Monorail Hoist</option><option>2.5t Monorail Hoist</option><option>5t Monorail Hoist</option><option>7.5t Monorail Hoist</option><option>17.5t TWH (ID Fan)</option><option>20t TWH (PAFD Fan)</option><option>35t Consolidated Hoist</option><option>25t USC-001 (UHF)</option><option>25t USC-002 ×10 (UHF)</option><option>25t EH-003 (UHF)</option><option>1t EH-012 (UHF)</option><option>DSL Mill Crane System</option></select></div>
+          <div class="fg"><label>Reason</label><select id="p-rsn"><option>Critical Breakdown Replacement</option><option>Routine Replenishment (Min. Stock)</option><option>LED Retrofit Project</option><option>Preventive Maintenance Spares</option><option>Capital Procurement</option></select></div>
+          <div class="fg"><label>Current Stock Level</label><input id="p-stk" placeholder="e.g. 0 nos. / 1 no. in pipeline"></div>
+          <div class="fg"><label>Quantity Required</label><input id="p-qty" placeholder="e.g. 2 nos."></div>
+          <div class="fg" style="grid-column:1/-1"><label>Technical Justification</label><input id="p-tech" placeholder="Why this specific specification is required..."></div>
+          <div class="fg" style="grid-column:1/-1"><label>Consequence of Non-Procurement</label><input id="p-risk" placeholder="Downtime risk, generation loss, safety hazard..."></div>
+        </div>
+        <button class="btn" onclick="genPR()">Generate Justification ↗</button>
+      </div>
+      <div id="pr-out" style="margin-top:18px"></div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<div class="modal-bg" id="mod-bg" onclick="closeMod(event)">
+  <div class="modal" id="mod-content">
+    <h2 id="mod-title"></h2><div class="modal-sub" id="mod-sub"></div>
+    <div class="pg2" id="mod-props"></div>
+    <button class="mc" onclick="closeMod()">Close</button>
+  </div>
+</div>
+
+<script>
+const API_KEY='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';
+const AI_CTX=`You are an expert Electrical Reliability Engineer and technical consultant for Manash Kumar Mitra, DGM of Electrical Maintenance at NTPC North Karanpura (NKSTPP), a 3×660MW thermal power plant. You have deep expertise in:
+- HT/LT motors (415V 3-ph, TEFC IP55, Class F, S4 duty), VFD systems (Yaskawa V1000: CIMR-VA4A0018 5.5kW, CIMR-VA4A0005 1.5kW), crane & hoist electrical systems
+- All NTPC cranes: 10t Gantry (Raw Water PH), 15t DG EOT (Intake Well), 15t CEP Under-Slung, 12t SG Under-Slung, 2–7.5t Monorail, 17.5t/20t TWH, 35t Consolidated Hoist, 3t Elevator
+- UHF Mill Cranes: 25t USC-001×2, USC-002×10, EH-003×2, EH-012×2 (Universal Hoist-O-Fabrik, Thane), DSL Conductix bus-bar, festoon cable systems, IMM-009/IMF-010 crane interlocks
+- Brake systems: DC EM disc (Pethe), AC EM disc (Pethe/EMCO/Universal), AC EHT (Electromag/Reva), brake rectifier panels
+- Control: contactors (Siemens/L&T/GE), OL relays, HRC fuses (GE/Siemens), limit switches (Siemens/BCH/JAI-Balaji), pendant stations (UHF Type-1/2)
+- Safety: LOTO, PTW, JSA, HIRA, HAZOP, CEA/IE Rules, NTPC Safety Policy, DBT scripts, Arc Flash PPE, Hierarchy of Hazard Controls
+- RCA (5-Why, Template A), Procurement justification (Template B, PSU standards)
+Be highly technical, use standard industrial terminology, bullet points, structured responses. Always mention safety first.`;
+
+// ─── DATA ─────────────────────────────────────────────────────────────────
+const motors=[
+  {sno:1,eq:"2t Monorail Hoist",app:"APH/FOPH/PAFD Handling",type:"Motor–Hoist (MH)",kw:3.7,hp:5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"112M",pop:1,make:"BBL/Siemens/Kirloskar/Crompton/Marathon",ref:"7100139820",spare:1,pri:"HIGH",rem:"112M frame; critical lifting",uhf:false},
+  {sno:2,eq:"2t Monorail Hoist",app:"APH/FOPH/PAFD Handling",type:"Motor–Cross Travel (CT)",kw:0.55,hp:0.75,volt:"415V 3Ph",poles:4,rpm:"~1440",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"90L",pop:1,make:"BBL/Siemens/Kirloskar/Crompton/Marathon",ref:"7100139820",spare:1,pri:"MEDIUM",rem:"Pool with 2.5t CT spare",uhf:false},
+  {sno:3,eq:"2.5t Monorail Hoist",app:"SCAPH/General Handling",type:"Motor–Hoist (MH)",kw:3.7,hp:5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"112M",pop:1,make:"BBL/Siemens/Kirloskar/Crompton/Marathon",ref:"7100139820",spare:1,pri:"HIGH",rem:"Same 112M as 2t; 1 spare covers both",uhf:false},
+  {sno:4,eq:"2.5t Monorail Hoist",app:"SCAPH/General Handling",type:"Motor–Cross Travel (CT)",kw:0.55,hp:0.75,volt:"415V 3Ph",poles:4,rpm:"~1440",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"90L",pop:1,make:"BBL/Siemens/Kirloskar/Crompton/Marathon",ref:"7100139820",spare:1,pri:"LOW",rem:"Pool with 2t CT",uhf:false},
+  {sno:5,eq:"5t Wire Rope Hoist",app:"Drain Pump Area",type:"Motor–Hoist (MH)",kw:3.7,hp:5,volt:"415V 3Ph",poles:6,rpm:"960",duty:"S4,40%CDF",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:1,make:"Marathon/ABB/Siemens/CGL",ref:"4410-001-110-B-028",spare:1,pri:"HIGH",rem:"Drain pump – critical area",uhf:false},
+  {sno:6,eq:"5t Wire Rope Hoist",app:"Drain Pump Area",type:"Motor–Cross Travel (CT)",kw:0.75,hp:1,volt:"415V 3Ph",poles:4,rpm:"1440",duty:"S4,40%CDF",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:1,make:"Marathon/ABB/Siemens/CGL",ref:"4410-001-110-B-028",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:7,eq:"7.5t Monorail Hoist",app:"General Material Handling",type:"Motor–Hoist (MH)",kw:7.5,hp:10,volt:"415V 3Ph",poles:6,rpm:"925–960",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"132M",pop:1,make:"BBL/Siemens/Kirloskar/Crompton/Marathon",ref:"7100139820",spare:1,pri:"HIGH",rem:"132M frame; dedicated spare",uhf:false},
+  {sno:8,eq:"7.5t Monorail Hoist",app:"General Material Handling",type:"Motor–Cross Travel (CT)",kw:0.75,hp:1,volt:"415V 3Ph",poles:4,rpm:"~1440",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"90L",pop:1,make:"BBL/Siemens/Kirloskar/Crompton/Marathon",ref:"7100139820",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:9,eq:"12t SG Under-Slung",app:"Vacuum Pump Area",type:"Motor–Hoist (MH)",kw:9.3,hp:12.5,volt:"415V 3Ph",poles:4,rpm:"1440",duty:"S4,40%CDF",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:1,make:"BBL/Siemens/Marathon/ABB/CGL",ref:"4410-001-110-B-028",spare:1,pri:"HIGH",rem:"Vacuum pump – high criticality",uhf:false},
+  {sno:10,eq:"12t SG Under-Slung",app:"Vacuum Pump Area",type:"Motor–Cross Travel (CT)",kw:0.75,hp:1,volt:"415V 3Ph",poles:4,rpm:"960",duty:"S4,40%CDF",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:1,make:"BBL/Siemens/Marathon/ABB/CGL",ref:"4410-001-110-B-028",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:11,eq:"15t DG EOT Crane",app:"Intake Well Pump House",type:"Motor–Hoist (MH)",kw:5.5,hp:7.5,volt:"415V 3Ph",poles:6,rpm:"960",duty:"S4,40%CDF,300st/hr",enc:"TEFC IP55",ins:"Cl-F (Cl-B rise)",frame:"As spec.",pop:1,make:"ABB/CGL/Marathon/Siemens/LHP/BBL",ref:"4410-001-301B",spare:1,pri:"HIGH",rem:"300 starts/hr – high wear",uhf:false},
+  {sno:12,eq:"15t DG EOT Crane",app:"Intake Well Pump House",type:"Motor–Cross Travel (CT)",kw:0.55,hp:0.75,volt:"415V 3Ph",poles:6,rpm:"960",duty:"S4,40%CDF,300st/hr",enc:"TEFC IP55",ins:"Cl-F (Cl-B rise)",frame:"As spec.",pop:1,make:"ABB/CGL/Marathon/Siemens/LHP/BBL",ref:"4410-001-301B",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:13,eq:"15t DG EOT Crane",app:"Intake Well Pump House",type:"Motor–Long Travel (LT)",kw:0.55,hp:0.75,volt:"415V 3Ph",poles:6,rpm:"960",duty:"S4,40%CDF,300st/hr",enc:"TEFC IP55",ins:"Cl-F (Cl-B rise)",frame:"As spec.",pop:2,make:"ABB/CGL/Marathon/Siemens/LHP/BBL",ref:"4410-001-301B",spare:2,pri:"MEDIUM",rem:"2 nos. installed",uhf:false},
+  {sno:14,eq:"15t CEP Under-Slung",app:"CEP Handling Indoor",type:"Motor–Hoist (MH)",kw:5.5,hp:7.5,volt:"415V 3Ph",poles:6,rpm:"925",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Cl-F (Cl-B rise)",frame:"As spec.",pop:1,make:"BBL (OEM specified)",ref:"4410-001-110-Y",spare:1,pri:"HIGH",rem:"BBL OEM only",uhf:false},
+  {sno:15,eq:"15t CEP Under-Slung",app:"CEP Handling Indoor",type:"Motor–Cross Travel (CT)",kw:0.75,hp:1,volt:"415V 3Ph",poles:6,rpm:"900",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Cl-F (Cl-B rise)",frame:"As spec.",pop:2,make:"BBL (OEM specified)",ref:"4410-001-110-Y",spare:1,pri:"MEDIUM",rem:"2 nos.",uhf:false},
+  {sno:16,eq:"15t CEP Under-Slung",app:"CEP Handling Indoor",type:"Motor–Long Travel (LT)",kw:0.75,hp:1,volt:"415V 3Ph",poles:6,rpm:"900",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Cl-F (Cl-B rise)",frame:"As spec.",pop:2,make:"BBL (OEM specified)",ref:"4410-001-110-Y",spare:1,pri:"MEDIUM",rem:"2 nos.",uhf:false},
+  {sno:17,eq:"10t DG Gantry Crane",app:"Raw Water PH (Outdoor)",type:"Motor–Hoist (MH)",kw:3.7,hp:5,volt:"415V 3Ph",poles:4,rpm:"1500(sync)",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:1,make:"CGL India (OEM)",ref:"4410-132A",spare:1,pri:"HIGH",rem:"Outdoor; CGL OEM; IP55 critical",uhf:false},
+  {sno:18,eq:"10t DG Gantry Crane",app:"Raw Water PH (Outdoor)",type:"Motor–Cross Travel (CT)",kw:0.55,hp:0.75,volt:"415V 3Ph",poles:4,rpm:"1500(sync)",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:1,make:"CGL India (OEM)",ref:"4410-132A",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:19,eq:"10t DG Gantry Crane",app:"Raw Water PH (Outdoor)",type:"Motor–Long Travel (LT)",kw:1.5,hp:2,volt:"415V 3Ph",poles:4,rpm:"1500(sync)",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:2,make:"CGL India (OEM)",ref:"4410-132A",spare:2,pri:"MEDIUM",rem:"2 nos.; outdoor",uhf:false},
+  {sno:20,eq:"17.5t Under-Hung TWH",app:"ID Fan Rotor Handling",type:"Motor–Hoist (MH)",kw:9.3,hp:12.5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"160M",pop:1,make:"BBL/Siemens/Marathon",ref:"7100139821",spare:1,pri:"HIGH",rem:"160M frame",uhf:false},
+  {sno:21,eq:"17.5t Under-Hung TWH",app:"ID Fan Rotor Handling",type:"Motor–Cross Travel (CT)",kw:1.1,hp:1.5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"90L",pop:2,make:"BBL/Siemens/Marathon",ref:"7100139821",spare:1,pri:"HIGH",rem:"2 nos.; 90L frame",uhf:false},
+  {sno:22,eq:"20t Under-Hung TWH",app:"PAFD Fan Motor Handling",type:"Motor–Hoist (MH)",kw:9.3,hp:12.5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"160M",pop:1,make:"BBL/Siemens/Marathon",ref:"7100139821",spare:1,pri:"HIGH",rem:"Pool with 17.5t MH",uhf:false},
+  {sno:23,eq:"20t Under-Hung TWH",app:"PAFD Fan Motor Handling",type:"Motor–Cross Travel (CT)",kw:1.1,hp:1.5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"90L",pop:2,make:"BBL/Siemens/Marathon",ref:"7100139821",spare:1,pri:"MEDIUM",rem:"Pool with 17.5t CT",uhf:false},
+  {sno:24,eq:"35t Consolidated Hoist",app:"FD/PA/ID/FOPH Handling",type:"Motor–Hoist (MH)",kw:15,hp:20,volt:"415V 3Ph",poles:6,rpm:"975",duty:"S4-40,150st/hr",enc:"TEFC IC411 IP55",ins:"Class F",frame:"ND160L",pop:1,make:"CGL India (OEM)",ref:"4410-001-102",spare:1,pri:"HIGH",rem:"ND160L CGL frame only",uhf:false},
+  {sno:25,eq:"35t Consolidated Hoist",app:"FD/PA/ID/FOPH Handling",type:"Motor–Cross Travel (CT)",kw:0.75,hp:1,volt:"415V 3Ph",poles:6,rpm:"935–950",duty:"S4-40,150st/hr",enc:"TEFC IC411 IP55",ins:"Class F",frame:"NG90S",pop:1,make:"CGL India (OEM)",ref:"4410-001-102",spare:1,pri:"MEDIUM",rem:"NG90S CGL specific",uhf:false},
+  {sno:26,eq:"3t Elevator MR Hoist",app:"Elevator MR Maintenance",type:"Motor–Hoist (MH)",kw:2.2,hp:3,volt:"415V 3Ph",poles:6,rpm:"Not spec.",duty:"S4,40%CDF",enc:"TEFC IP55",ins:"Cl-F (70°C)",frame:"As spec.",pop:1,make:"NTPC Approved List",ref:"4410-001-110-B-122",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:27,eq:"3t Elevator MR Hoist",app:"Elevator MR Maintenance",type:"Motor–Cross Travel (CT)",kw:0.37,hp:0.5,volt:"415V 3Ph",poles:8,rpm:"Not spec.",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:1,make:"NTPC Approved List",ref:"4410-001-110-B-122",spare:1,pri:"LOW",rem:"8-pole; low wear",uhf:false},
+  {sno:28,eq:"25t USC-001 (×2)",app:"Mill Crane Handling",type:"Motor–Hoist (MH)",kw:9.3,hp:12.5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"S4,Outdoor",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:2,make:"Crompton Greaves / BBL",ref:"EH-003/USC-001 (UHF)",spare:1,pri:"HIGH",rem:"Pop:2; same frame as 17.5t/20t TWH MH",uhf:true},
+  {sno:29,eq:"25t USC-001 (×2)",app:"Mill Crane Handling",type:"Motor–Cross Travel (CT)",kw:1.1,hp:1.5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"S4,Outdoor",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:2,make:"Crompton Greaves / BBL",ref:"USC-001 (UHF)",spare:1,pri:"MEDIUM",rem:"Pool spare with USC-002 CT",uhf:true},
+  {sno:30,eq:"25t USC-002 (×10)",app:"Mill Crane Handling",type:"Motor–Hoist (MH)",kw:9.3,hp:12.5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"S4,Outdoor",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:10,make:"Crompton Greaves / BBL",ref:"USC-002 (UHF)",spare:1,pri:"HIGH",rem:"Pop:10 – largest fleet; pool with USC-001 MH",uhf:true},
+  {sno:31,eq:"25t USC-002 (×10)",app:"Mill Crane Handling",type:"Motor–Cross Travel (CT)",kw:1.1,hp:1.5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"S4,Outdoor",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:10,make:"Crompton Greaves / BBL",ref:"USC-002 (UHF)",spare:1,pri:"MEDIUM",rem:"Pop:10; same rating across all USC",uhf:true},
+  {sno:32,eq:"25t EH-003 (×2)",app:"Mill/ID Fan Area",type:"Motor–Hoist (MH)",kw:9.3,hp:12.5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"Crane Duty,Cl-F",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:2,make:"Crompton Greaves / BBL / Marathon",ref:"EH-003 (UHF)",spare:1,pri:"HIGH",rem:"1 spare covers EH-003+USC-001/002 MH",uhf:true},
+  {sno:33,eq:"25t EH-003 (×2)",app:"Mill/ID Fan Area",type:"Motor–Cross Travel (CT)",kw:1.1,hp:1.5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"Crane Duty,Cl-F",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:2,make:"Crompton Greaves / BBL / Marathon",ref:"EH-003 (UHF)",spare:1,pri:"MEDIUM",rem:"1 spare covers all CT in USC/EH series",uhf:true},
+  {sno:34,eq:"1t EH-012 (×2)",app:"Auxiliary Light Duty",type:"Motor–Hoist (MH)",kw:0.37,hp:0.5,volt:"415V 3Ph",poles:6,rpm:"Not spec.",duty:"Crane Duty,Cl-F",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:2,make:"Crompton Greaves",ref:"EH-012 (UHF)",spare:1,pri:"MEDIUM",rem:"Light duty; small motor",uhf:true},
+  {sno:35,eq:"1t EH-012 (×2)",app:"Auxiliary Light Duty",type:"Motor–Cross Travel (CT)",kw:0.15,hp:0.2,volt:"415V 3Ph",poles:6,rpm:"Not spec.",duty:"Crane Duty,Cl-F",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:2,make:"Crompton Greaves",ref:"EH-012 (UHF)",spare:1,pri:"LOW",rem:"Very small; low duty",uhf:true},
+];
+
+const brakes=[
+  {sno:1,eq:"2t EWRH",app:"ACC Deck Maintenance",type:"DC EM Disc (Fail-Safe)",cat:"Hoist (MH)",size:"195mm",torq:8,sf:"150% FLT",pop:1,make:"Pethe",ref:"4410-001-110-B-028",spare:1,pri:"HIGH",rem:"Coil + disc; critical",uhf:false},
+  {sno:2,eq:"2t EWRH",app:"ACC Deck Maintenance",type:"DC EM Disc (Fail-Safe)",cat:"Cross Travel (CT)",size:"110mm",torq:1,sf:"125% FLT",pop:1,make:"Pethe",ref:"4410-001-110-B-028",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:3,eq:"5t EWRH",app:"Drain Pump Area",type:"DC EM Disc (Fail-Safe)",cat:"Hoist (MH)",size:"195mm",torq:8,sf:"150% FLT",pop:1,make:"Pethe",ref:"4410-001-110-B-028",spare:1,pri:"HIGH",rem:"Same 195mm as 2t; pool spare",uhf:false},
+  {sno:4,eq:"5t EWRH",app:"Drain Pump Area",type:"DC EM Disc (Fail-Safe)",cat:"Cross Travel (CT)",size:"110mm",torq:1,sf:"125% FLT",pop:1,make:"Pethe",ref:"4410-001-110-B-028",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:5,eq:"12t SG Under-Slung",app:"Vacuum Pump Area",type:"DC EM Disc (Fail-Safe)",cat:"Hoist (MH)",size:"230mm",torq:14,sf:"150% FLT",pop:1,make:"Pethe",ref:"4410-001-110-B-028",spare:1,pri:"HIGH",rem:"230mm; keep 1 coil + 1 disc",uhf:false},
+  {sno:6,eq:"12t SG Under-Slung",app:"Vacuum Pump Area",type:"DC EM Disc (Fail-Safe)",cat:"Cross Travel (CT)",size:"110mm",torq:1,sf:"125% FLT",pop:1,make:"Pethe",ref:"4410-001-110-B-028",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:7,eq:"12t SG Under-Slung",app:"Vacuum Pump Area",type:"DC EM Disc (Fail-Safe)",cat:"Long Travel (LT)",size:"130mm",torq:2,sf:"125% FLT",pop:2,make:"Pethe",ref:"4410-001-110-B-028",spare:1,pri:"MEDIUM",rem:"2 nos.",uhf:false},
+  {sno:8,eq:"15t DG EOT Crane",app:"Intake Well PH",type:"DC EM Disc (Fail-Safe)",cat:"Hoist (MH)",size:"Size-16",torq:8.16,sf:"150% FLT",pop:1,make:"Electromag/SOCB/CHK/Pethe",ref:"4410-001-301B",spare:1,pri:"HIGH",rem:"Verify Electromag model no.",uhf:false},
+  {sno:9,eq:"15t DG EOT Crane",app:"Intake Well PH",type:"AC EHT (Fail-Safe)",cat:"Hoist (MH)",size:"SMD160×235",torq:20,sf:"150% FLT",pop:1,make:"Electromag/SOCB/CHK/Pethe",ref:"4410-001-301B",spare:1,pri:"HIGH",rem:"EHT – stock thruster oil + coil",uhf:false},
+  {sno:10,eq:"15t DG EOT Crane",app:"Intake Well PH",type:"AC Disc Brake (Fail-Safe)",cat:"Cross Travel (CT)",size:"Size-8",torq:0.82,sf:"125% FLT",pop:1,make:"Electromag/SOCB/CHK/Pethe",ref:"4410-001-301B",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:11,eq:"15t DG EOT Crane",app:"Intake Well PH",type:"AC Disc Brake (Fail-Safe)",cat:"Long Travel (LT)",size:"Size-8",torq:0.82,sf:"125% FLT",pop:2,make:"Electromag/SOCB/CHK/Pethe",ref:"4410-001-301B",spare:1,pri:"MEDIUM",rem:"2 nos.",uhf:false},
+  {sno:12,eq:"15t CEP Under-Slung",app:"CEP Handling Indoor",type:"DC Disc Brake (Fail-Safe)",cat:"Hoist (MH)",size:"Size-18",torq:15.3,sf:"150% FLT",pop:1,make:"Per AVL",ref:"4410-001-110-Y",spare:1,pri:"HIGH",rem:"High torque; coil + disc",uhf:false},
+  {sno:13,eq:"15t CEP Under-Slung",app:"CEP Handling Indoor",type:"DC Disc Brake (Fail-Safe)",cat:"Cross Travel (CT)",size:"Size-10",torq:1.6,sf:"125% FLT",pop:2,make:"Per AVL",ref:"4410-001-110-Y",spare:1,pri:"MEDIUM",rem:"2 nos.",uhf:false},
+  {sno:14,eq:"15t CEP Under-Slung",app:"CEP Handling Indoor",type:"DC Disc Brake (Fail-Safe)",cat:"Long Travel (LT)",size:"Size-10",torq:1.6,sf:"125% FLT",pop:2,make:"Per AVL",ref:"4410-001-110-Y",spare:1,pri:"MEDIUM",rem:"2 nos.",uhf:false},
+  {sno:15,eq:"10t DG Gantry Crane",app:"Raw Water PH (Outdoor)",type:"AC EHT (Fail-Safe)",cat:"Hoist (MH)",size:"100-18",torq:6,sf:"As spec.",pop:1,make:"Reva/AVL",ref:"4410-132A",spare:1,pri:"HIGH",rem:"EHT – check oil; outdoor",uhf:false},
+  {sno:16,eq:"10t DG Gantry Crane",app:"Raw Water PH (Outdoor)",type:"DC Disc (Fail-Safe)",cat:"Hoist (MH)",size:"Size-14",torq:6.12,sf:"As spec.",pop:1,make:"Reva/AVL",ref:"4410-132A",spare:1,pri:"HIGH",rem:"Dual MH brake (EHT + DC disc)",uhf:false},
+  {sno:17,eq:"10t DG Gantry Crane",app:"Raw Water PH (Outdoor)",type:"AC EHT (Fail-Safe)",cat:"Cross Travel (CT)",size:"100-18",torq:6,sf:"As spec.",pop:1,make:"Reva/AVL",ref:"4410-132A",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:18,eq:"10t DG Gantry Crane",app:"Raw Water PH (Outdoor)",type:"AC EHT (Fail-Safe)",cat:"Long Travel (LT)",size:"100-18",torq:6,sf:"As spec.",pop:2,make:"Reva/AVL",ref:"4410-132A",spare:1,pri:"MEDIUM",rem:"2 nos.",uhf:false},
+  {sno:19,eq:"2t Monorail Hoist",app:"APH/FOPH Handling",type:"AC EM Disc – Fail-Safe",cat:"Hoist (MH)",size:"Per motor",torq:"Calc.",sf:"Not spec.",pop:1,make:"Pethe/EMCO/Universal",ref:"7100139820",spare:1,pri:"HIGH",rem:"Stock disc + coil",uhf:false},
+  {sno:20,eq:"2t Monorail Hoist",app:"APH/FOPH Handling",type:"AC EM Disc – Fail-Safe",cat:"Cross Travel (CT)",size:"Per motor",torq:"Calc.",sf:"Not spec.",pop:1,make:"Pethe/EMCO/Universal",ref:"7100139820",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:21,eq:"2.5t Monorail Hoist",app:"SCAPH Handling",type:"AC EM Disc – Fail-Safe",cat:"Hoist (MH)",size:"Per motor",torq:"Calc.",sf:"Not spec.",pop:1,make:"Pethe/EMCO/Universal",ref:"7100139820",spare:1,pri:"HIGH",rem:"Pool with 2t MH brake",uhf:false},
+  {sno:22,eq:"2.5t Monorail Hoist",app:"SCAPH Handling",type:"AC EM Disc – Fail-Safe",cat:"Cross Travel (CT)",size:"Per motor",torq:"Calc.",sf:"Not spec.",pop:1,make:"Pethe/EMCO/Universal",ref:"7100139820",spare:1,pri:"LOW",rem:"",uhf:false},
+  {sno:23,eq:"5t Monorail Hoist",app:"General Handling",type:"AC EM Disc – Fail-Safe",cat:"Hoist (MH)",size:"Per motor",torq:"Calc.",sf:"Not spec.",pop:1,make:"Pethe/EMCO/Universal",ref:"7100139820",spare:1,pri:"HIGH",rem:"",uhf:false},
+  {sno:24,eq:"5t Monorail Hoist",app:"General Handling",type:"AC EM Disc – Fail-Safe",cat:"Cross Travel (CT)",size:"Per motor",torq:"Calc.",sf:"Not spec.",pop:1,make:"Pethe/EMCO/Universal",ref:"7100139820",spare:1,pri:"LOW",rem:"",uhf:false},
+  {sno:25,eq:"7.5t Monorail Hoist",app:"General Handling",type:"AC EM Disc – Fail-Safe",cat:"Hoist (MH)",size:"Per motor",torq:"Calc.",sf:"Not spec.",pop:1,make:"Pethe/EMCO/Universal",ref:"7100139820",spare:1,pri:"HIGH",rem:"",uhf:false},
+  {sno:26,eq:"7.5t Monorail Hoist",app:"General Handling",type:"AC EM Disc – Fail-Safe",cat:"Cross Travel (CT)",size:"Per motor",torq:"Calc.",sf:"Not spec.",pop:1,make:"Pethe/EMCO/Universal",ref:"7100139820",spare:1,pri:"LOW",rem:"",uhf:false},
+  {sno:27,eq:"17.5t Under-Hung TWH",app:"ID Fan Rotor Handling",type:"AC EM Disc – Fail-Safe",cat:"Hoist (MH)",size:"Per motor",torq:"Calc.",sf:"Not spec.",pop:1,make:"Pethe/EMCO/Universal",ref:"7100139821",spare:1,pri:"HIGH",rem:"ID fan – priority spare",uhf:false},
+  {sno:28,eq:"17.5t Under-Hung TWH",app:"ID Fan Rotor Handling",type:"AC EM Disc – Fail-Safe",cat:"Cross Travel (CT)",size:"Per motor",torq:"Calc.",sf:"Not spec.",pop:2,make:"Pethe/EMCO/Universal",ref:"7100139821",spare:1,pri:"HIGH",rem:"2 nos.",uhf:false},
+  {sno:29,eq:"20t Under-Hung TWH",app:"PAFD Fan Handling",type:"AC EM Disc – Fail-Safe",cat:"Hoist (MH)",size:"Per motor",torq:"Calc.",sf:"Not spec.",pop:1,make:"Pethe/EMCO/Universal",ref:"7100139821",spare:1,pri:"HIGH",rem:"Pool with 17.5t MH",uhf:false},
+  {sno:30,eq:"20t Under-Hung TWH",app:"PAFD Fan Handling",type:"AC EM Disc – Fail-Safe",cat:"Cross Travel (CT)",size:"Per motor",torq:"Calc.",sf:"Not spec.",pop:2,make:"Pethe/EMCO/Universal",ref:"7100139821",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:31,eq:"35t Consolidated Hoist",app:"FD/PA/ID/FOPH",type:"Confirm with CGL OEM",cat:"Hoist (MH)",size:"Per motor",torq:"Calc.",sf:"Not spec.",pop:1,make:"Per AVL",ref:"4410-001-102",spare:1,pri:"HIGH",rem:"Confirm brake type with CGL",uhf:false},
+  {sno:32,eq:"35t Consolidated Hoist",app:"FD/PA/ID/FOPH",type:"Confirm with CGL OEM",cat:"Cross Travel (CT)",size:"Per motor",torq:"Calc.",sf:"Not spec.",pop:1,make:"Per AVL",ref:"4410-001-102",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:33,eq:"3t Elevator MR Hoist",app:"Elevator MR",type:"DC EM Disc (Fail-Safe)",cat:"Hoist (MH)",size:"150mm",torq:3.8,sf:"Not spec.",pop:1,make:"Per AVL",ref:"4410-001-110-B-122",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:34,eq:"3t Elevator MR Hoist",app:"Elevator MR",type:"DC EM Disc (Fail-Safe)",cat:"Cross Travel (CT)",size:"100mm",torq:0.6,sf:"Not spec.",pop:1,make:"Per AVL",ref:"4410-001-110-B-122",spare:1,pri:"LOW",rem:"",uhf:false},
+  {sno:35,eq:"25t USC-001+002 (×12 total)",app:"All USC Cranes – Hoist",type:"AC EM Disc – Fail-Safe",cat:"Hoist (MH)",size:"Per 9.3kW motor",torq:"Calc.",sf:"150% FLT",pop:12,make:"Pethe/EMCO/Universal",ref:"USC-001/002 (UHF)",spare:2,pri:"HIGH",rem:"Pop:12; stock coil + friction disc separately",uhf:true},
+  {sno:36,eq:"25t USC-001+002 (×12 total)",app:"All USC Cranes – CT",type:"AC EM Disc – Fail-Safe",cat:"Cross Travel (CT)",size:"Per 1.1kW motor",torq:"Calc.",sf:"125% FLT",pop:12,make:"Pethe/EMCO/Universal",ref:"USC-001/002 (UHF)",spare:1,pri:"MEDIUM",rem:"Pool spare with monorail CT brakes",uhf:true},
+  {sno:37,eq:"25t EH-003 (×2)",app:"Mill/ID Fan – Hoist",type:"AC EM Disc – Fail-Safe",cat:"Hoist (MH)",size:"Per 9.3kW motor",torq:"Calc.",sf:"150% FLT",pop:2,make:"Pethe/EMCO/Universal",ref:"EH-003 (UHF)",spare:1,pri:"HIGH",rem:"Confirm exact disc/coil size from EH-003 drawing",uhf:true},
+  {sno:38,eq:"25t EH-003 (×2)",app:"Mill/ID Fan – CT",type:"AC EM Disc – Fail-Safe",cat:"Cross Travel (CT)",size:"Per 1.1kW motor",torq:"Calc.",sf:"125% FLT",pop:2,make:"Pethe/EMCO/Universal",ref:"EH-003 (UHF)",spare:1,pri:"MEDIUM",rem:"2 nos.",uhf:true},
+  {sno:39,eq:"1t EH-012 (×2)",app:"Aux Light Duty Hoist",type:"AC EM Disc – Fail-Safe",cat:"Hoist (MH)",size:"Per 0.37kW motor",torq:"Calc.",sf:"Not spec.",pop:2,make:"Pethe/EMCO/Universal",ref:"EH-012 (UHF)",spare:1,pri:"MEDIUM",rem:"Small brake; low wear rate",uhf:true},
+];
+
+const controls=[
+  {sno:1,eq:"2t/2.5t Monorail",app:"Incoming Isolation",comp:"Main Isolating Switch",rating:"32A, 3-pole TPN, lockable",volt:"415V AC",cat:"Isolation",pop:1,make:"Siemens/L&T",ref:"7100139820",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:2,eq:"5t/7.5t Monorail",app:"Incoming Isolation",comp:"Main Isolating Switch",rating:"63A, 3-pole TPN, lockable",volt:"415V AC",cat:"Isolation",pop:1,make:"Siemens/L&T",ref:"7100139820",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:3,eq:"2t–7.5t Monorail",app:"Main Feeder",comp:"Main Contactor (MC)",rating:"22A, AC-3, 4-pole",volt:"415V, Coil 110V",cat:"Contactor",pop:1,make:"Siemens/L&T",ref:"7100139820",spare:2,pri:"HIGH",rem:"150 starts/hr; highest wear; keep 2",uhf:false},
+  {sno:4,eq:"2t–7.5t Monorail",app:"Hoist Up/Down",comp:"Hoist Contactors H/L",rating:"22A, AC-3",volt:"415V, Coil 110V",cat:"Contactor",pop:2,make:"Siemens/L&T",ref:"7100139820",spare:2,pri:"HIGH",rem:"2 per hoist; most frequent wear",uhf:false},
+  {sno:5,eq:"2t–7.5t Monorail",app:"CT Forward/Reverse",comp:"CT Contactors F/R",rating:"16A, AC-3",volt:"415V, Coil 110V",cat:"Contactor",pop:2,make:"Siemens/L&T",ref:"7100139820",spare:2,pri:"HIGH",rem:"2 per hoist",uhf:false},
+  {sno:6,eq:"2t–7.5t Monorail",app:"Control Voltage",comp:"Control Transformer (TR)",rating:"100–150VA, 415V/110V AC",volt:"415V/110V",cat:"Transformer",pop:1,make:"Sekappa",ref:"7100139820",spare:1,pri:"MEDIUM",rem:"Sekappa specified",uhf:false},
+  {sno:7,eq:"2t–7.5t Monorail",app:"Circuit Protection",comp:"Control Fuses CF1/CF2/CF3",rating:"20A HRC Fuse, DIN",volt:"415V",cat:"Fuse",pop:3,make:"Siemens/GE",ref:"7100139820",spare:6,pri:"HIGH",rem:"Consumable; keep 6",uhf:false},
+  {sno:8,eq:"2t–7.5t Monorail",app:"Hoist Motor Protection",comp:"Hoist Fuse F1",rating:"32A HRC Fuse, DIN",volt:"415V",cat:"Fuse",pop:1,make:"Siemens/GE",ref:"7100139820",spare:3,pri:"HIGH",rem:"Keep 3 min",uhf:false},
+  {sno:9,eq:"2t–7.5t Monorail",app:"CT Motor Protection",comp:"CT Fuse F2",rating:"20A HRC Fuse, DIN",volt:"415V",cat:"Fuse",pop:1,make:"Siemens/GE",ref:"7100139820",spare:3,pri:"HIGH",rem:"Consumable",uhf:false},
+  {sno:10,eq:"2t–7.5t Monorail",app:"MH Thermal Protection",comp:"Overload Relay OL1 (Hoist)",rating:"8–12.5A / 16–25A range",volt:"415V",cat:"OL Relay",pop:1,make:"Siemens/L&T",ref:"7100139820",spare:1,pri:"HIGH",rem:"1 spare per range",uhf:false},
+  {sno:11,eq:"2t–7.5t Monorail",app:"CT Thermal Protection",comp:"Overload Relay OL2 (CT)",rating:"1.6–2.5A / 2.5–4.0A range",volt:"415V",cat:"OL Relay",pop:1,make:"Siemens/L&T",ref:"7100139820",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:12,eq:"2t–7.5t Monorail",app:"Floor Level Control",comp:"Pendant Pushbutton Station",rating:"10A, 8-way, IP55",volt:"110V AC",cat:"Control",pop:1,make:"Siemens/Vaishno/Telemecanique",ref:"7100139820",spare:1,pri:"HIGH",rem:"Cable wear = common fault",uhf:false},
+  {sno:13,eq:"2t–7.5t Monorail",app:"Status Indication",comp:"Panel Indicator Lamp",rating:"110V AC, LED multi-colour",volt:"110V AC",cat:"Indication",pop:1,make:"Vaishno/Siemens",ref:"7100139820",spare:2,pri:"LOW",rem:"Keep R/Y/G assorted",uhf:false},
+  {sno:14,eq:"2t–7.5t Monorail",app:"Panel Wiring",comp:"Terminal Blocks (6mm²)",rating:"6mm², screw type",volt:"—",cat:"Wiring",pop:"Req.",make:"Elemex/Wago/Connectwell",ref:"7100139820",spare:20,pri:"LOW",rem:"Keep 20 nos.",uhf:false},
+  {sno:15,eq:"2t–7.5t Monorail",app:"Panel Housing",comp:"Control Panel Enclosure",rating:"IP55, GI/MS sheet",volt:"—",cat:"Enclosure",pop:1,make:"Rittal/Pyrotech",ref:"7100139820",spare:0,pri:"LOW",rem:"Only if damaged",uhf:false},
+  {sno:16,eq:"17.5t/20t TWH",app:"Incoming Isolation",comp:"Main Isolating Switch",rating:"63A, 3-pole TPN, lockable",volt:"415V AC",cat:"Isolation",pop:1,make:"Siemens/L&T",ref:"7100139821",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:17,eq:"17.5t/20t TWH",app:"Main + Hoist Control",comp:"Main + Hoist Contactors MC/H-L",rating:"38A, AC-3",volt:"415V, Coil 110V",cat:"Contactor",pop:3,make:"Siemens/L&T",ref:"7100139821",spare:2,pri:"HIGH",rem:"38A; heavier duty",uhf:false},
+  {sno:18,eq:"17.5t/20t TWH",app:"CT Forward/Reverse",comp:"CT Contactors F/R",rating:"16A, AC-3",volt:"415V, Coil 110V",cat:"Contactor",pop:2,make:"Siemens/L&T",ref:"7100139821",spare:2,pri:"HIGH",rem:"",uhf:false},
+  {sno:19,eq:"17.5t/20t TWH",app:"Control Voltage",comp:"Control Transformer",rating:"150VA, 415V/110V AC",volt:"415V/110V",cat:"Transformer",pop:1,make:"Sekappa",ref:"7100139821",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:20,eq:"17.5t/20t TWH",app:"MH Motor Protection",comp:"Hoist Fuse F1",rating:"100A HRC Fuse",volt:"415V",cat:"Fuse",pop:1,make:"Siemens/GE",ref:"7100139821",spare:2,pri:"HIGH",rem:"100A – keep 2",uhf:false},
+  {sno:21,eq:"17.5t/20t TWH",app:"MH Thermal Protection",comp:"Overload Relay OL1",rating:"16–25A range",volt:"415V",cat:"OL Relay",pop:1,make:"Siemens/L&T",ref:"7100139821",spare:1,pri:"HIGH",rem:"",uhf:false},
+  {sno:22,eq:"17.5t/20t TWH",app:"CT Thermal Protection",comp:"Overload Relay OL2",rating:"2.5–4.0A range",volt:"415V",cat:"OL Relay",pop:1,make:"Siemens/L&T",ref:"7100139821",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:23,eq:"2t–7.5t Monorail",app:"Hoist Upper/Lower Limit",comp:"Hoist Limit Switches 1LS1/1LS2",rating:"5A, Snap-action, IP55",volt:"415V",cat:"Limit Switch",pop:2,make:"Siemens/BCH",ref:"7100139820",spare:2,pri:"HIGH",rem:"Lever wear prone",uhf:false},
+  {sno:24,eq:"2t–7.5t Monorail",app:"CT End of Travel",comp:"CT Limit Switches 2LS1/2LS2",rating:"5A, Two-way Lever, IP55",volt:"415V",cat:"Limit Switch",pop:2,make:"Siemens/BCH",ref:"7100139820",spare:2,pri:"HIGH",rem:"2 per hoist",uhf:false},
+  {sno:25,eq:"17.5t/20t TWH",app:"Hoist + CT Limits",comp:"Limit Switches (Hoist + CT)",rating:"5A, IP55",volt:"415V",cat:"Limit Switch",pop:4,make:"Siemens/BCH",ref:"7100139821",spare:2,pri:"HIGH",rem:"2 hoist + 2 CT",uhf:false},
+  {sno:26,eq:"15t DG EOT Crane",app:"MH/CT/LT Limits",comp:"Limit Switches – Rotary/Lever",rating:"3A min, Ag-CdO contacts",volt:"415V",cat:"Limit Switch",pop:3,make:"Per AVL",ref:"4410-001-301B",spare:2,pri:"HIGH",rem:"1 MH+1 CT+1 LT",uhf:false},
+  {sno:27,eq:"10t DG Gantry Crane",app:"MH/CT/LT Limits",comp:"Limit Switches – Rotary/Lever",rating:"3A min, IP65",volt:"415V",cat:"Limit Switch",pop:3,make:"Per AVL",ref:"4410-132A",spare:2,pri:"HIGH",rem:"Outdoor – IP65",uhf:false},
+  {sno:28,eq:"15t CEP Under-Slung",app:"MH/CT/LT Limits",comp:"Limit Switches",rating:"3A min",volt:"415V",cat:"Limit Switch",pop:4,make:"Per AVL",ref:"4410-001-110-Y",spare:2,pri:"HIGH",rem:"2 MH+1 CT+1 LT",uhf:false},
+  {sno:29,eq:"15t CEP Under-Slung",app:"MH VFD",comp:"VFD Yaskawa V1000 – 5.5kW",rating:"CIMR-VA4A0018, HD",volt:"380–480V 3Ph",cat:"VFD",pop:1,make:"Yaskawa (OEM only)",ref:"4410-001-110-Y",spare:1,pri:"HIGH",rem:"OEM authorised only",uhf:false},
+  {sno:30,eq:"15t CEP Under-Slung",app:"CT VFD",comp:"VFD Yaskawa V1000 – 1.5kW",rating:"CIMR-VA4A0005, HD",volt:"380–480V 3Ph",cat:"VFD",pop:1,make:"Yaskawa (OEM only)",ref:"4410-001-110-Y",spare:1,pri:"HIGH",rem:"1 spare covers CT+LT",uhf:false},
+  {sno:31,eq:"15t CEP Under-Slung",app:"LT VFD",comp:"VFD Yaskawa V1000 – 1.5kW",rating:"CIMR-VA4A0005, HD",volt:"380–480V 3Ph",cat:"VFD",pop:1,make:"Yaskawa (OEM only)",ref:"4410-001-110-Y",spare:1,pri:"HIGH",rem:"Pool with CT drive",uhf:false},
+  {sno:32,eq:"15t DG EOT/10t Gantry",app:"All Motors Speed Control",comp:"VVVF AC Drive (per motor)",rating:"As per motor rating",volt:"415V 3Ph",cat:"VFD",pop:3,make:"Per AVL (Reva OEM)",ref:"4410-001-301B & 132A",spare:1,pri:"HIGH",rem:"Confirm make with Reva",uhf:false},
+  {sno:33,eq:"15t DG EOT Crane",app:"Incoming Isolation",comp:"Incoming Isolating Switch",rating:"63A, 3-pole",volt:"415V",cat:"Isolation",pop:1,make:"Per AVL",ref:"4410-001-301B",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:34,eq:"10t DG Gantry Crane",app:"Incoming Isolation",comp:"Incoming Isolating Switch",rating:"100A, 3-pole",volt:"415V",cat:"Isolation",pop:1,make:"Per AVL",ref:"4410-132A",spare:1,pri:"MEDIUM",rem:"100A – outdoor",uhf:false},
+  {sno:35,eq:"15t CEP Under-Slung",app:"Incoming Isolation",comp:"Incoming Isolating Switch",rating:"63A, 3-pole",volt:"415V",cat:"Isolation",pop:1,make:"Per AVL",ref:"4410-001-110-Y",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:36,eq:"3t Elevator MR Hoist",app:"Incoming Isolation",comp:"Incoming Isolating Switch",rating:"32A, 3-pole",volt:"415V",cat:"Isolation",pop:1,make:"Per AVL",ref:"4410-001-110-B-122",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:37,eq:"10t DG Gantry Crane",app:"Floor Control",comp:"Pendant Pushbutton Station",rating:"14-way, IP55",volt:"110V AC",cat:"Control",pop:1,make:"Per AVL",ref:"4410-132A",spare:1,pri:"HIGH",rem:"14-way",uhf:false},
+  {sno:38,eq:"15t DG EOT Crane",app:"Floor Control",comp:"Pendant Pushbutton Station",rating:"16-way, IP55",volt:"110V AC",cat:"Control",pop:1,make:"Per AVL",ref:"4410-001-301B",spare:1,pri:"HIGH",rem:"16-way",uhf:false},
+  {sno:39,eq:"15t CEP Under-Slung",app:"Floor Control",comp:"Pendant Pushbutton Station",rating:"12-way, IP55",volt:"110V AC",cat:"Control",pop:1,make:"Per AVL",ref:"4410-001-110-Y",spare:1,pri:"HIGH",rem:"12-way",uhf:false},
+  {sno:40,eq:"All Cranes & Hoists",app:"Emergency Stop",comp:"E-Stop Pushbutton",rating:"40mm mushroom, NC, IP55",volt:"110V AC",cat:"Safety",pop:1,make:"Siemens/Telemecanique/L&T",ref:"All crane TDS",spare:4,pri:"HIGH",rem:"Keep 4 in stock",uhf:false},
+  // UHF
+  {sno:41,eq:"All USC/EH (UHF)",app:"Incoming – USC-001/002",comp:"Main Switch 63A Isolator",rating:"63A, 3-pole TPN, lockable",volt:"415V AC",cat:"Isolation",pop:1,make:"Siemens/GE",ref:"ECD/USC-001 (UHF)",spare:1,pri:"HIGH",rem:"UHF circuit diagrams; 63A for 25t",uhf:true},
+  {sno:42,eq:"EH-012 (UHF)",app:"Incoming – EH-012",comp:"Main Switch 25A Isolator",rating:"25A, 3-pole TPN, lockable",volt:"415V AC",cat:"Isolation",pop:1,make:"Siemens/GE",ref:"ECD/EH-012 (UHF)",spare:1,pri:"MEDIUM",rem:"25A for 1t hoist",uhf:true},
+  {sno:43,eq:"All USC/EH (UHF)",app:"Main Feeder – USC",comp:"Main Contactor (MC) 16A",rating:"16A, AC-3",volt:"415V, Coil 110V",cat:"Contactor",pop:1,make:"Siemens/GE",ref:"ECD/USC-001 (UHF)",spare:2,pri:"HIGH",rem:"Frequent switching; keep 2",uhf:true},
+  {sno:44,eq:"EH-003 (UHF)",app:"Main Feeder – EH-003",comp:"Main Contactor (MC) 38A",rating:"38A, AC-3",volt:"415V, Coil 110V",cat:"Contactor",pop:1,make:"Siemens/GE",ref:"ECD/EH-003 (UHF)",spare:2,pri:"HIGH",rem:"38A; heavier duty",uhf:true},
+  {sno:45,eq:"All USC/EH (UHF)",app:"Hoist Up/Down",comp:"Hoist Contactors H/L 16A",rating:"16A, AC-3",volt:"415V, Coil 110V",cat:"Contactor",pop:2,make:"Siemens/GE",ref:"ECD/USC-001 (UHF)",spare:2,pri:"HIGH",rem:"2 per crane; highest cycling",uhf:true},
+  {sno:46,eq:"All USC/EH (UHF)",app:"CT Forward/Reverse",comp:"CT Contactors F/R 12A",rating:"12A, AC-3",volt:"415V, Coil 110V",cat:"Contactor",pop:2,make:"Siemens/GE",ref:"ECD/USC-001 (UHF)",spare:2,pri:"HIGH",rem:"2 per crane",uhf:true},
+  {sno:47,eq:"EH-003 (UHF)",app:"Trolley & Forward Control",comp:"T&F Contactor 16A",rating:"16A, AC-3",volt:"415V, Coil 110V",cat:"Contactor",pop:1,make:"Siemens/GE",ref:"ECD/EH-003 (UHF)",spare:1,pri:"HIGH",rem:"EH-003 specific trolley contactor",uhf:true},
+  {sno:48,eq:"All USC/EH (UHF)",app:"Control Voltage",comp:"Control Transformer 100VA",rating:"100VA, 415V/110V AC",volt:"415V/110V",cat:"Transformer",pop:1,make:"SE/Kappa (UHF specified)",ref:"ECD/USC-001 (UHF)",spare:1,pri:"MEDIUM",rem:"SE/Kappa brand in UHF drawings",uhf:true},
+  {sno:49,eq:"All USC/EH (UHF)",app:"Control Fuse Protection",comp:"Control Fuses CF1/CF2 32A Fuselink",rating:"32A HRC Fuselink (GE specified)",volt:"415V",cat:"Fuse",pop:2,make:"GE (UHF specified)",ref:"ECD/USC-001 (UHF)",spare:6,pri:"HIGH",rem:"GE brand; consumable; keep 6",uhf:true},
+  {sno:50,eq:"All USC/EH (UHF)",app:"Control Fuse Protection",comp:"Control Fuse CF3 20A",rating:"20A HRC Fuse",volt:"415V",cat:"Fuse",pop:1,make:"GE/Siemens",ref:"ECD/USC-001 (UHF)",spare:3,pri:"HIGH",rem:"Consumable; keep 3",uhf:true},
+  {sno:51,eq:"USC-001/002 (UHF)",app:"Hoist Motor Protection",comp:"Hoist Fuse F1 32A",rating:"32A HRC Fuse",volt:"415V",cat:"Fuse",pop:1,make:"GE/Siemens",ref:"ECD/USC-001 (UHF)",spare:3,pri:"HIGH",rem:"Consumable",uhf:true},
+  {sno:52,eq:"EH-003 (UHF)",app:"Hoist Motor Protection",comp:"Hoist Fuse F1 125A Fuselink",rating:"125A HRC Fuselink",volt:"415V",cat:"Fuse",pop:1,make:"GE/Siemens",ref:"ECD/EH-003 (UHF)",spare:2,pri:"HIGH",rem:"125A for 9.3kW; keep 2",uhf:true},
+  {sno:53,eq:"All USC/EH (UHF)",app:"CT Motor Protection",comp:"CT Fuse F2 20A",rating:"20A HRC Fuse",volt:"415V",cat:"Fuse",pop:1,make:"GE/Siemens",ref:"ECD/USC-001 (UHF)",spare:3,pri:"HIGH",rem:"Consumable",uhf:true},
+  {sno:54,eq:"All USC/EH (UHF)",app:"Hoist Motor Thermal",comp:"OL Relay OL-1 2.5–4.0A",rating:"2.5–4.0A range",volt:"415V",cat:"OL Relay",pop:1,make:"Siemens/GE",ref:"ECD/USC-001 (UHF)",spare:1,pri:"HIGH",rem:"Set per motor FLA",uhf:true},
+  {sno:55,eq:"EH-003 (UHF)",app:"Hoist Motor Thermal",comp:"OL Relay OL-1 16–25A",rating:"16–25A range (EH-003 9.3kW)",volt:"415V",cat:"OL Relay",pop:1,make:"Siemens/GE",ref:"ECD/EH-003 (UHF)",spare:1,pri:"HIGH",rem:"EH-003 specific range",uhf:true},
+  {sno:56,eq:"All USC/EH (UHF)",app:"CT Motor Thermal",comp:"OL Relay OL-2 2.5–4.0A",rating:"2.5–4.0A range",volt:"415V",cat:"OL Relay",pop:1,make:"Siemens/GE",ref:"ECD/USC-001 (UHF)",spare:1,pri:"MEDIUM",rem:"Same range all USC/EH CT",uhf:true},
+  {sno:57,eq:"EH-003 (UHF)",app:"Load / Slack Rope Protection",comp:"Load Relay (O/A) 50–80A Adj.",rating:"50–80A adjustable",volt:"415V",cat:"Protection Relay",pop:1,make:"Siemens (ECD/EH-003)",ref:"ECD/EH-003 (UHF)",spare:1,pri:"HIGH",rem:"EH-003 specific; confirm setting with UHF OEM",uhf:true},
+  {sno:58,eq:"All USC/EH (UHF)",app:"Hoist End of Travel",comp:"Hoist LS1/LS2 10A Lever",rating:"10A, Lever type, IP55",volt:"415V",cat:"Limit Switch",pop:2,make:"JAI-Balaji/Siemens/BCH",ref:"ECD/USC-001 (UHF)",spare:2,pri:"HIGH",rem:"JAI-Balaji specified; lever arm wear prone",uhf:true},
+  {sno:59,eq:"All USC/EH (UHF)",app:"CT End of Travel",comp:"CT Limit Switches 2LS1/2LS2 5A",rating:"5A, Two-way Lever, IP55",volt:"415V",cat:"Limit Switch",pop:2,make:"JAI-Balaji/Siemens/BCH",ref:"ECD/USC-001 (UHF)",spare:2,pri:"HIGH",rem:"JAI-Balaji specified",uhf:true},
+  {sno:60,eq:"USC-001/002 (UHF)",app:"Floor Control – Type 1",comp:"Pendant Station Type-1 (6-way)",rating:"IP55, 3mm² armoured cable",volt:"110V AC",cat:"Control",pop:1,make:"UHF/Trisect/Hoist-O-Fabrik",ref:"UHF/PB-001 (UHF)",spare:1,pri:"HIGH",rem:"Cable wear = common fault; Zn passivated hook",uhf:true},
+  {sno:61,eq:"EH-003/EH-012 (UHF)",app:"Floor Control – Type 2",comp:"Pendant Station Type-2 (4-way)",rating:"IP55, 3mm² armoured cable",volt:"110V AC",cat:"Control",pop:1,make:"UHF/Trisect/Hoist-O-Fabrik",ref:"UHF/PB-001 (UHF)",spare:1,pri:"MEDIUM",rem:"Hoist only pendant; armoured cable",uhf:true},
+  {sno:62,eq:"All UHF Control Panels",app:"Wiring Termination",comp:"Elmex Terminal Blocks 6mm²",rating:"6mm², screw type",volt:"—",cat:"Wiring",pop:"Req.",make:"Elmex (UHF specified)",ref:"All ECD (UHF)",spare:20,pri:"LOW",rem:"Elmex brand across all UHF drawings",uhf:true},
+  {sno:63,eq:"All UHF Control Panels",app:"Status Indication",comp:"Indicating Lamp 110V AC LS type",rating:"110V AC, LS series",volt:"110V AC",cat:"Indication",pop:1,make:"Teknic/Siemens/Elemex",ref:"ECD/USC-001 (UHF)",spare:4,pri:"LOW",rem:"Keep R/Y/G assorted; 4 in stock",uhf:true},
+  {sno:64,eq:"All UHF Control Panels",app:"Panel Enclosure (Rittal spec.)",comp:"Control Panel Enclosure IP55/IP56",rating:"IP55/IP56; double-compression glands",volt:"—",cat:"Enclosure",pop:1,make:"Rittal (UHF/CP-001 spec.)",ref:"UHF/CP-001 (UHF)",spare:0,pri:"LOW",rem:"Rittal specified; procure only if damaged",uhf:true},
+];
+
+const auxiliaries=[
+  {sno:1,eq:"12t SG / 2t & 5t EWRH",app:"DC Supply for Brake Coils",comp:"Brake Rectifier Panel",rating:"415V AC → DC output",volt:"415V AC/DC",pop:4,make:"Per AVL",ref:"4410-001-110-B-028",spare:1,pri:"HIGH",rem:"Critical – no rectifier = brakes dead",uhf:false},
+  {sno:2,eq:"10t DG Gantry Crane",app:"DC Supply for DC Disc Brakes",comp:"Brake Rectifier Panel",rating:"415V AC → DC output",volt:"415V AC/DC",pop:1,make:"Per AVL",ref:"4410-132A",spare:1,pri:"HIGH",rem:"Outdoor; check diodes",uhf:false},
+  {sno:3,eq:"15t DG EOT Crane",app:"DC Supply for DC Disc Brakes",comp:"Brake Rectifier Panel",rating:"415V AC → DC output",volt:"415V AC/DC",pop:1,make:"Per AVL",ref:"4410-001-301B",spare:1,pri:"HIGH",rem:"",uhf:false},
+  {sno:4,eq:"15t CEP Under-Slung",app:"DC Supply for DC Disc Brakes",comp:"Brake Rectifier Panel",rating:"415V AC → DC output",volt:"415V AC/DC",pop:1,make:"Per AVL",ref:"4410-001-110-Y",spare:1,pri:"HIGH",rem:"",uhf:false},
+  {sno:5,eq:"3t Elevator MR Hoist",app:"DC Supply for Brake Coils",comp:"Brake Rectifier Panel",rating:"415V AC → DC output",volt:"415V AC/DC",pop:1,make:"Per AVL",ref:"4410-001-110-B-122",spare:1,pri:"MEDIUM",rem:"",uhf:false},
+  {sno:6,eq:"2t–7.5t Monorail Hoists",app:"AC Supply for EM Disc Brakes",comp:"Brake Supply Panel (AC EM)",rating:"415V AC to AC EM brake coils",volt:"415V AC",pop:4,make:"Per AVL",ref:"7100139820",spare:1,pri:"HIGH",rem:"1 per hoist",uhf:false},
+  {sno:7,eq:"17.5t/20t Under-Hung TWH",app:"AC Supply for EM Disc Brakes",comp:"Brake Supply Panel (AC EM)",rating:"415V AC to AC EM brake coils",volt:"415V AC",pop:2,make:"Per AVL",ref:"7100139821",spare:1,pri:"HIGH",rem:"1 per TWH",uhf:false},
+  {sno:8,eq:"10t DG Gantry Crane",app:"Wireless Control (+ Pendant)",comp:"Radio Remote Control Set (1Tx+1Rx)",rating:"Min 6 ch, IP65 industrial, E-Stop",volt:"415V to receiver",pop:1,make:"Industrial Grade IP65/AVL",ref:"4410-132A",spare:1,pri:"HIGH",rem:"Stock both Tx & Rx",uhf:false},
+  {sno:9,eq:"10t Gantry/15t EOT/15t CEP",app:"Control Logic Interlocking",comp:"Auxiliary Relays – Drive Panel",rating:"110V AC coil, 2NO+2NC, 5–10A",volt:"110V AC coil",pop:10,make:"Siemens/Schneider/L&T",ref:"All Reva crane TDS",spare:5,pri:"HIGH",rem:"Keep min 5 per type",uhf:false},
+  {sno:10,eq:"10t Gantry/15t EOT/15t CEP",app:"Motor Feeder Prot. – Small",comp:"Fuse Switch Unit (FSU) 32A",rating:"32A, 3-pole, motor duty",volt:"415V AC",pop:3,make:"Siemens/Schneider/L&T",ref:"All Reva crane TDS",spare:2,pri:"HIGH",rem:"1 per small motor",uhf:false},
+  {sno:11,eq:"10t Gantry/15t EOT/15t CEP",app:"Motor Feeder Prot. – Medium",comp:"Fuse Switch Unit (FSU) 63A",rating:"63A, 3-pole, motor duty",volt:"415V AC",pop:3,make:"Siemens/Schneider/L&T",ref:"All Reva crane TDS",spare:1,pri:"HIGH",rem:"1 per medium motor",uhf:false},
+  {sno:12,eq:"10t Gantry/15t EOT/15t CEP",app:"Motor Feeder Prot. – Large",comp:"Fuse Switch Unit (FSU) 100A",rating:"100A, 3-pole, motor duty",volt:"415V AC",pop:3,make:"Siemens/Schneider/L&T",ref:"All Reva crane TDS",spare:1,pri:"HIGH",rem:"1 per large MH motor",uhf:false},
+  {sno:13,eq:"15t CEP Under-Slung – MH",app:"Dynamic Braking – Hoist VFD",comp:"Dynamic Braking Resistor (5.5kW)",rating:"For Yaskawa V1000 CIMR-VA4A0018",volt:"VFD DC Bus",pop:1,make:"Yaskawa/AVL",ref:"4410-001-110-Y",spare:1,pri:"HIGH",rem:"Must match VFD DC bus voltage",uhf:false},
+  {sno:14,eq:"15t CEP Under-Slung – CT",app:"Dynamic Braking – CT VFD",comp:"Dynamic Braking Resistor (1.5kW)",rating:"For Yaskawa V1000 CIMR-VA4A0005",volt:"VFD DC Bus",pop:1,make:"Yaskawa/AVL",ref:"4410-001-110-Y",spare:1,pri:"HIGH",rem:"1 spare covers CT+LT",uhf:false},
+  {sno:15,eq:"15t CEP Under-Slung – LT",app:"Dynamic Braking – LT VFD",comp:"Dynamic Braking Resistor (1.5kW)",rating:"For Yaskawa V1000 CIMR-VA4A0005",volt:"VFD DC Bus",pop:1,make:"Yaskawa/AVL",ref:"4410-001-110-Y",spare:1,pri:"HIGH",rem:"Pool with CT DBR",uhf:false},
+  {sno:16,eq:"10t Gantry/15t DG EOT",app:"Dynamic Braking – VVVF",comp:"Dynamic Braking Resistors (VVVF)",rating:"Per VFD mfr.; 3 per crane",volt:"VFD DC Bus",pop:6,make:"Per VFD Mfr./AVL",ref:"4410-132A & 301B TDS",spare:2,pri:"HIGH",rem:"Confirm Ω & kW with VVVF OEM",uhf:false},
+  {sno:17,eq:"All Control Panels",app:"Status Indication",comp:"Panel Indicating Lamps (LED)",rating:"110V AC / 24V DC LED",volt:"110V/24V DC",pop:20,make:"Siemens/Schneider/AVL",ref:"All crane/hoist TDS",spare:10,pri:"LOW",rem:"Keep assorted R/Y/G",uhf:false},
+  {sno:18,eq:"All Control Panels",app:"Cable Entry",comp:"Cable Glands (IP55, assorted)",rating:"M16–M40, brass/nickel, 1100V",volt:"1100V grade",pop:"Req.",make:"Per AVL",ref:"All crane/hoist TDS",spare:20,pri:"LOW",rem:"Assorted M16/M20/M25/M32/M40",uhf:false},
+  {sno:19,eq:"All Control Panels",app:"Conductor Termination",comp:"Cable Lugs & Ferrules (copper)",rating:"1.5–35mm², copper, DIN",volt:"1100V grade",pop:"Req.",make:"Per AVL",ref:"All crane/hoist TDS",spare:50,pri:"LOW",rem:"Keep 50 nos. assorted",uhf:false},
+  {sno:20,eq:"All Control Panels",app:"Panel Earthing",comp:"Earthing Bus Bar & Earth Terminals",rating:"Copper busbar",volt:"—",pop:1,make:"Standard/AVL",ref:"All crane/hoist TDS",spare:2,pri:"LOW",rem:"1 spare busbar per panel type",uhf:false},
+  // UHF
+  {sno:21,eq:"All UHF Cranes (×14)",app:"AC Supply for EM Disc Brakes",comp:"Brake Supply Panel (AC EM)",rating:"415V AC to AC EM brake coils",volt:"415V AC",pop:"1/crane",make:"Per AVL",ref:"ECD/USC-001 (UHF)",spare:1,pri:"HIGH",rem:"1 per crane; stock 1 common spare",uhf:true},
+  {sno:22,eq:"25t Mill Crane DSL System",app:"Bus-Bar Power Feed",comp:"DSL (Conductix) Bus-Bar Track 30kW",rating:"30kW, 415V AC 3Ph 50Hz",volt:"415V AC 3Ph",pop:"Per layout",make:"Conductix/Universal/SFU-SIE/GE",ref:"DSL-004/005 (UHF)",spare:1,pri:"HIGH",rem:"30kW per supply point; confirm DSL model with UHF; critical power feed",uhf:true},
+  {sno:23,eq:"25t USC-002 Festoon Cable",app:"CT Travel Power – Festoon",comp:"Festoon Cable + Trolley (UE-25)",rating:"JS:9968, 30M/2.5sq.mm×4c; SFU200A trolley",volt:"415V, 1100V grade",pop:6,make:"Universal/Polycab/SFU-SIE/GE",ref:"DSL-006/007 (UHF)",spare:2,pri:"HIGH",rem:"6 sets/crane; travel 12.5–15.5m; festoon cable = common fault",uhf:true},
+  {sno:24,eq:"25t Mill Crane Festoon",app:"Rope Clamp + End Strainer",comp:"Rope Clamp + SFU + Bracket Assembly",rating:"4 rope clamps + 1 end strainer + 2 bracket/set",volt:"—",pop:4,make:"M.S. Standard/Universal",ref:"DSL-006 (UHF)",spare:4,pri:"MEDIUM",rem:"Wear item; keep 4 spare clamps",uhf:true},
+  {sno:25,eq:"25t Mill Crane DSL Track",app:"SFU at DSL Feed Points",comp:"Fuse Switch Unit (SFU) 32A at DSL",rating:"32A, 3-pole at each DSL supply point",volt:"415V AC",pop:1,make:"Siemens/GE",ref:"DSL-004/005 (UHF)",spare:1,pri:"HIGH",rem:"Critical for crane power feed; keep 1 spare",uhf:true},
+  {sno:26,eq:"25t Mill Crane Safety",app:"Crane-to-Crane Interlock",comp:"Crane Interlock Assembly (IMM-009 & IMF-010)",rating:"18 Male + 18 Female; spring-actuated + limit switch",volt:"415V AC signal",pop:18,make:"Universal Hoist-O-Fabrik (OEM ONLY)",ref:"IMM-009 & IMF-010 (UHF)",spare:2,pri:"HIGH",rem:"Safety critical; UHF OEM spare ONLY; contains limit switch inside",uhf:true},
+  {sno:27,eq:"All UHF Control Panels",app:"Cable Entry – Double-Compression",comp:"Cable Glands IP55/IP56 Double-Compression",rating:"IP55/IP56, M16–M40 double-compression",volt:"1100V grade",pop:"Req.",make:"Per AVL",ref:"UHF/CP-001 (UHF)",spare:20,pri:"LOW",rem:"Double-compression type specified; keep M16/M20/M25/M32 assorted",uhf:true},
+  {sno:28,eq:"25t Mill Crane DSL Track",app:"Fixed Power Supply Cable",comp:"Fixed DSL Supply Cable (6×length)",rating:"JS:9968, 30M/2.5sq.mm×4c; nylon rope insulator",volt:"415V, 1100V grade",pop:6,make:"Universal/Polycab",ref:"DSL-006 (UHF)",spare:1,pri:"MEDIUM",rem:"Fixed cable at each DSL point; inspect insulator/rope clamp",uhf:true},
+  {sno:29,eq:"All UHF Cranes – E-Stop",app:"Emergency Stop on Pendant",comp:"E-Stop Pushbutton – UHF Pendant",rating:"40mm mushroom, NC, IP55; PP/ABS enclosure",volt:"110V AC",pop:1,make:"UHF/Siemens/Telemecanique",ref:"UHF/PB-001 (UHF)",spare:4,pri:"HIGH",rem:"Fitted to all UHF pendants; keep 4 standalone for damaged pendant replacement",uhf:true},
+];
+
+const vendors=[
+  ["LT Motors (All)","BBL, Siemens, Kirloskar, CGL India, Crompton Greaves, Marathon Electric, ABB","Per NTPC approved list; IS:325; verify frame & duty cycle before ordering"],
+  ["EM Brakes (DC/AC/EHT)","Pethe Industrial, EMCO, Universal, Electromag, SOCB, CHK, Akkuem","Verify coil voltage & disc size; stock coil AND friction disc separately"],
+  ["Contactors & OL Relays","Siemens, L&T, GE (for UHF drawings)","AC-3 duty; coil 110V AC; stock spare contact blocks NO/NC"],
+  ["HRC Fuses","GE (UHF drawings), Siemens","DIN HRC; keep 20A, 32A, 63A, 100A, 125A Fuselink; min 5 per rating"],
+  ["Limit Switches","Siemens, BCH Electric, JAI-Balaji (UHF drawings)","IP55 min (IP65 outdoor); Ag-CdO contacts; snap-action + rotary + lever types"],
+  ["VFD / VVVF Drives","Yaskawa (CIMR-VA series – OEM only); VVVF per Reva OEM","Always use OEM authorised service centre for Yaskawa V1000"],
+  ["Pendant Stations","UHF/Hoist-O-Fabrik (Type-1/2); Siemens/Vaishno/Telemecanique","Match pendant type to crane; IP55; 3mm² armoured cable for UHF Type-1/2"],
+  ["Control Transformers","SE/Kappa (UHF), Sekappa (NTPC), Servokon, Pragati","SE/Kappa for UHF cranes; Sekappa for NTPC cranes"],
+  ["Brake Rectifier Panels","Per crane OEM (Century/Reva/CGL/BBL/Mangla/UHF)","Output voltage must exactly match brake coil rating; get spec from OEM"],
+  ["DSL Bus-Bar System","Conductix-Wampfler (UHF specified); Universal","30kW 415V; confirm DSL model and current rating with UHF OEM"],
+  ["Festoon Cable & Trolley","Universal (UE-25 trolley), Polycab (JS:9968 cable)","30M/2.5sq.mm×4c; SFU200A trolley; inspect festoon cable regularly"],
+  ["UHF Interlock Mechanism","Universal Hoist-O-Fabrik (OEM ONLY — IMM-009/IMF-010)","Safety critical; NO substitution; contact UHF Thane for spares"],
+  ["Aux Relays & FSU","Siemens, Schneider Electric, L&T","Relays: 110V AC coil; FSU: motor duty 32A/63A/100A"],
+  ["DBR (Dynamic Braking Res.)","Yaskawa (for V1000); VVVF OEM for Reva cranes","Must match drive DC bus voltage and kW rating exactly; never substitute"],
+  ["Panel Enclosures","Rittal (UHF/CP-001), Pyrotech (NTPC cranes)","IP55/IP56; double-compression glands for UHF panels"],
+];
+
+// ─── PAGINATION & STATE ────────────────────────────────────────────────────
+const PS=12;
+let mState={p:1,f:'',sort:{k:null,d:1}};
+let bState={p:1};let cState={p:1};let aState={p:1};
+
+function priB(p){const m={HIGH:'br',MEDIUM:'ba',LOW:'bg'};return`<span class="badge ${m[p]||'bt'}">${p}</span>`;}
+function priLed(p){return p==='HIGH'?'led-h':p==='MEDIUM'?'led-m':'led-l';}
+function filt(data,sid){const q=(document.getElementById(sid)||{value:''}).value.toLowerCase();return q?data.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(q))):data;}
+function pgRender(data,tbody,cnt,pgEl,prev,next,rowFn,state){
+  const total=data.length,start=(state.p-1)*PS,end=start+PS,rows=data.slice(start,end);
+  document.getElementById(tbody).innerHTML=rows.map(rowFn).join('');
+  document.getElementById(cnt).textContent=`${start+1}–${Math.min(end,total)} of ${total}`;
+  document.getElementById(pgEl).textContent=`Page ${state.p}/${Math.ceil(total/PS)||1}`;
+  document.getElementById(prev).disabled=state.p<=1;
+  document.getElementById(next).disabled=end>=total;
+}
+
+function renderMotors(){
+  let d=[...motors];
+  if(mState.f==='MH')d=d.filter(r=>r.type.includes('MH'));
+  else if(mState.f==='CT')d=d.filter(r=>r.type.includes('CT'));
+  else if(mState.f==='LT')d=d.filter(r=>r.type.includes('LT'));
+  else if(mState.f==='HIGH')d=d.filter(r=>r.pri==='HIGH');
+  else if(mState.f==='UHF')d=d.filter(r=>r.uhf);
+  const q=(document.getElementById('msrch')||{value:''}).value.toLowerCase();
+  if(q)d=d.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(q)));
+  if(mState.sort.k){const k=mState.sort.k,dr=mState.sort.d;d.sort((a,b)=>{const av=isNaN(a[k])?String(a[k]):+a[k],bv=isNaN(b[k])?String(b[k]):+b[k];return av<bv?-dr:av>bv?dr:0;});}
+  const total=d.length,start=(mState.p-1)*PS,end=start+PS,rows=d.slice(start,end);
+  const tc={MH:'bt',CT:'cb',LT:'cam'};
+  document.getElementById('mtbody').innerHTML=rows.map(r=>{
+    const t=r.type.includes('MH')?'bt':r.type.includes('CT')?'bb':'ba';
+    return`<tr class="${r.uhf?'uhf-row':''}">
+      <td style="font-family:var(--mono);color:var(--text3)">${r.sno}</td>
+      <td style="font-weight:500">${r.eq}${r.uhf?' <span class="badge bb" style="font-size:8px">UHF</span>':''}</td>
+      <td style="color:var(--text2);font-size:10px">${r.app}</td>
+      <td><span class="badge ${t}">${r.type.replace('Motor–','')}</span></td>
+      <td style="font-family:var(--mono);color:var(--accent)">${r.kw}</td>
+      <td style="font-size:10px">${r.volt}</td>
+      <td style="font-size:10px">${r.poles}P / ${r.rpm}</td>
+      <td style="font-size:10px;color:var(--text2)">${r.duty}</td>
+      <td style="font-size:10px">${r.frame}</td>
+      <td style="font-family:var(--mono)">${r.pop}</td>
+      <td style="font-size:10px;color:var(--text2)">${r.make}</td>
+      <td style="font-family:var(--mono);color:var(--accent)">${r.spare}</td>
+      <td>${priB(r.pri)}</td>
+      <td style="font-size:10px;color:var(--text2)">${r.rem}</td>
+    </tr>`}).join('');
+  document.getElementById('mcnt').textContent=`${start+1}–${Math.min(end,total)} of ${total}`;
+  document.getElementById('mpg').textContent=`Page ${mState.p}/${Math.ceil(total/PS)||1}`;
+  document.getElementById('mprev').disabled=mState.p<=1;
+  document.getElementById('mnext').disabled=end>=total;
+}
+function mFilter(f){mState.f=f;mState.p=1;renderMotors();}
+function mPage(d){mState.p=Math.max(1,mState.p+d);renderMotors();}
+function sortM(k){if(mState.sort.k===k)mState.sort.d*=-1;else{mState.sort.k=k;mState.sort.d=1;}renderMotors();}
+
+function renderBrakes(){
+  const d=filt(brakes,'bsrch');
+  pgRender(d,'btbody','bcnt','bpg','bprev','bnext',r=>`<tr class="${r.uhf?'uhf-row':''}">
+    <td style="font-family:var(--mono);color:var(--text3)">${r.sno}</td>
+    <td style="font-weight:500">${r.eq}${r.uhf?' <span class="badge bb" style="font-size:8px">UHF</span>':''}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.app}</td>
+    <td style="font-weight:500;font-size:11px">${r.type}</td>
+    <td><span class="badge ${r.cat.includes('Hoist')?'bt':r.cat.includes('LT')?'ba':'bb'}">${r.cat}</span></td>
+    <td style="font-family:var(--mono)">${r.size}</td>
+    <td style="font-family:var(--mono);color:var(--accent)">${r.torq}</td>
+    <td style="font-size:10px">${r.sf}</td>
+    <td style="font-family:var(--mono)">${r.pop}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.make}</td>
+    <td style="font-family:var(--mono);color:var(--accent)">${r.spare}</td>
+    <td>${priB(r.pri)}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.rem}</td>
+  </tr>`,bState);
+}
+function bPage(d){bState.p=Math.max(1,bState.p+d);renderBrakes();}
+
+function renderControl(){
+  const d=filt(controls,'csrch');
+  pgRender(d,'ctbody','ccnt','cpg','cprev','cnext',r=>`<tr class="${r.uhf?'uhf-row':''}">
+    <td style="font-family:var(--mono);color:var(--text3)">${r.sno}</td>
+    <td style="font-size:11px;font-weight:500">${r.eq}${r.uhf?' <span class="badge bb" style="font-size:8px">UHF</span>':''}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.app}</td>
+    <td style="font-weight:500">${r.comp}</td>
+    <td style="font-size:10px;color:var(--accent)">${r.rating}</td>
+    <td style="font-size:10px">${r.volt}</td>
+    <td><span class="badge bt" style="font-size:9px">${r.cat}</span></td>
+    <td style="font-family:var(--mono)">${r.pop}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.make}</td>
+    <td style="font-family:var(--mono);color:var(--accent)">${r.spare}</td>
+    <td>${priB(r.pri)}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.rem}</td>
+  </tr>`,cState);
+}
+function cPage(d){cState.p=Math.max(1,cState.p+d);renderControl();}
+
+function renderAux(){
+  const d=filt(auxiliaries,'asrch');
+  pgRender(d,'atbody','acnt','apg','aprev','anext',r=>`<tr class="${r.uhf?'uhf-row':''}">
+    <td style="font-family:var(--mono);color:var(--text3)">${r.sno}</td>
+    <td style="font-size:11px;font-weight:500">${r.eq}${r.uhf?' <span class="badge bb" style="font-size:8px">UHF</span>':''}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.app}</td>
+    <td style="font-weight:500">${r.comp}</td>
+    <td style="font-size:10px;color:var(--accent)">${r.rating}</td>
+    <td style="font-size:10px">${r.volt}</td>
+    <td style="font-family:var(--mono)">${r.pop}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.make}</td>
+    <td style="font-family:var(--mono);color:var(--accent)">${r.spare}</td>
+    <td>${priB(r.pri)}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.rem}</td>
+  </tr>`,aState);
+}
+function aPage(d){aState.p=Math.max(1,aState.p+d);renderAux();}
+
+// ─── RACK VIEW ─────────────────────────────────────────────────────────────
+function renderRack(){
+  const cranes=[
+    {name:"10t DG Gantry Crane",area:"Raw Water PH (Outdoor)",uhf:false,slots:[
+      {n:"U01",c:"Main Isolating Switch",r:"100A, 3-pole",p:"HIGH"},
+      {n:"U02",c:"VVVF Drive – MH",r:"3.7kW / 5HP",p:"HIGH"},
+      {n:"U03",c:"VVVF Drive – CT",r:"0.55kW",p:"HIGH"},
+      {n:"U04",c:"VVVF Drive – LT ×2",r:"1.5kW each",p:"HIGH"},
+      {n:"U05",c:"Brake Rectifier Panel",r:"415V AC → DC",p:"HIGH"},
+      {n:"U06",c:"AC EHT Brake MH (100-18)",r:"6 kg.m",p:"HIGH"},
+      {n:"U07",c:"DC Disc Brake MH (Size-14)",r:"6.12 kg.m",p:"HIGH"},
+      {n:"U08",c:"AC EHT Brakes CT+LT ×3",r:"100-18",p:"MEDIUM"},
+      {n:"U09",c:"Pendant Station 14-way IP65",r:"110V AC",p:"HIGH"},
+      {n:"U10",c:"Limit Switches ×3 (IP65)",r:"Rotary/Lever 3A",p:"HIGH"},
+      {n:"U11",c:"RRC Set (Tx+Rx) IP65",r:"Min 6-ch",p:"HIGH"},
+      {n:"U12",c:"FSU – Motor Feeders",r:"32A/63A/100A",p:"HIGH"},
+    ]},
+    {name:"15t DG EOT Crane",area:"Intake Well Pump House",uhf:false,slots:[
+      {n:"U01",c:"Main Isolating Switch",r:"63A, 3-pole",p:"MEDIUM"},
+      {n:"U02",c:"VVVF Drive – MH",r:"5.5kW / 7.5HP",p:"HIGH"},
+      {n:"U03",c:"VVVF Drive – CT",r:"0.55kW",p:"HIGH"},
+      {n:"U04",c:"VVVF Drive – LT ×2",r:"0.55kW each",p:"HIGH"},
+      {n:"U05",c:"Brake Rectifier Panel",r:"415V AC → DC",p:"HIGH"},
+      {n:"U06",c:"DC EM Disc Brake MH (Size-16)",r:"8.16 kg.m",p:"HIGH"},
+      {n:"U07",c:"AC EHT MH (SMD160×235)",r:"20 kg.m",p:"HIGH"},
+      {n:"U08",c:"AC Disc Brake CT+LT",r:"0.82 kg.m",p:"MEDIUM"},
+      {n:"U09",c:"Pendant Station 16-way IP55",r:"110V AC",p:"HIGH"},
+      {n:"U10",c:"Limit Switches ×3 (Ag-CdO)",r:"Rotary/Lever 3A",p:"HIGH"},
+      {n:"U11",c:"Aux Relays Drive Panel",r:"110V AC coil",p:"HIGH"},
+      {n:"U12",c:"FSU Motor Feeders ×3",r:"32A/63A/100A",p:"HIGH"},
+    ]},
+    {name:"15t CEP Under-Slung (Yaskawa V1000)",area:"CEP Handling Indoor",uhf:false,slots:[
+      {n:"U01",c:"Isolating Switch",r:"63A, 3-pole",p:"MEDIUM"},
+      {n:"U02",c:"Yaskawa V1000 MH — CIMR-VA4A0018",r:"5.5kW HD",p:"HIGH"},
+      {n:"U03",c:"Yaskawa V1000 CT — CIMR-VA4A0005",r:"1.5kW HD",p:"HIGH"},
+      {n:"U04",c:"Yaskawa V1000 LT — CIMR-VA4A0005",r:"1.5kW HD",p:"HIGH"},
+      {n:"U05",c:"DBR – MH Drive",r:"For CIMR-VA4A0018",p:"HIGH"},
+      {n:"U06",c:"DBR – CT + LT ×2",r:"For CIMR-VA4A0005",p:"HIGH"},
+      {n:"U07",c:"Brake Rectifier Panel",r:"415V AC → DC",p:"HIGH"},
+      {n:"U08",c:"DC Disc Brake MH (Size-18)",r:"15.3 kg.m",p:"HIGH"},
+      {n:"U09",c:"DC Disc Brake CT+LT (Size-10)",r:"1.6 kg.m",p:"MEDIUM"},
+      {n:"U10",c:"Pendant Station 12-way IP55",r:"110V AC",p:"HIGH"},
+      {n:"U11",c:"Limit Switches ×4",r:"3A min (2MH+1CT+1LT)",p:"HIGH"},
+      {n:"U12",c:"FSU Motor Feeders",r:"32A/63A/100A",p:"HIGH"},
+    ]},
+    {name:"2t–7.5t Monorail Hoists",area:"APH / FOPH / SCAPH / General",uhf:false,slots:[
+      {n:"U01",c:"Main Isolating Switch",r:"32A–63A, TPN",p:"MEDIUM"},
+      {n:"U02",c:"Main Contactor (MC) 22A",r:"AC-3, 4-pole",p:"HIGH"},
+      {n:"U03",c:"Hoist Contactors H/L ×2",r:"22A, AC-3",p:"HIGH"},
+      {n:"U04",c:"CT Contactors F/R ×2",r:"16A, AC-3",p:"HIGH"},
+      {n:"U05",c:"Step-Down Transformer",r:"100–150VA, Sekappa",p:"MEDIUM"},
+      {n:"U06",c:"Control Fuses CF1/2/3",r:"20A HRC DIN ×3",p:"HIGH"},
+      {n:"U07",c:"Hoist Fuse F1",r:"32A HRC DIN",p:"HIGH"},
+      {n:"U08",c:"OL Relay MH (OL1)",r:"8–25A range",p:"HIGH"},
+      {n:"U09",c:"OL Relay CT (OL2)",r:"1.6–4.0A",p:"MEDIUM"},
+      {n:"U10",c:"AC EM Disc Brakes (Fail-Safe)",r:"Per motor calc.",p:"HIGH"},
+      {n:"U11",c:"Pendant Station 8-way IP55",r:"10A, 110V AC",p:"HIGH"},
+      {n:"U12",c:"Hoist + CT Limit Switches",r:"5A, IP55",p:"HIGH"},
+    ]},
+    {name:"17.5t & 20t Under-Hung TWH",area:"ID Fan / PAFD Fan Area",uhf:false,slots:[
+      {n:"U01",c:"Main Isolating Switch",r:"63A, TPN",p:"MEDIUM"},
+      {n:"U02",c:"Main + Hoist Contactors ×3",r:"38A, AC-3",p:"HIGH"},
+      {n:"U03",c:"CT Contactors F/R ×2",r:"16A, AC-3",p:"HIGH"},
+      {n:"U04",c:"Step-Down Transformer",r:"150VA, Sekappa",p:"MEDIUM"},
+      {n:"U05",c:"Hoist Fuse F1",r:"100A HRC",p:"HIGH"},
+      {n:"U06",c:"OL Relay MH (OL1)",r:"16–25A",p:"HIGH"},
+      {n:"U07",c:"AC EM Disc Brakes (Fail-Safe)",r:"Per motor calc.",p:"HIGH"},
+      {n:"U08",c:"Brake Supply Panel (AC EM)",r:"415V AC to coils",p:"HIGH"},
+      {n:"U09",c:"Limit Switches Hoist+CT ×4",r:"5A, IP55",p:"HIGH"},
+    ]},
+    {name:"25t USC-001/002 Mill Cranes (UHF)",area:"Mill Crane Area – NKSTPP",uhf:true,slots:[
+      {n:"U01",c:"Main Switch 63A Isolator",r:"63A, TPN lockable",p:"HIGH"},
+      {n:"U02",c:"Main Contactor (MC) 16A",r:"16A, AC-3",p:"HIGH"},
+      {n:"U03",c:"Hoist Contactors H/L 16A ×2",r:"16A, AC-3",p:"HIGH"},
+      {n:"U04",c:"CT Contactors F/R 12A ×2",r:"12A, AC-3",p:"HIGH"},
+      {n:"U05",c:"Control Transformer 100VA",r:"SE/Kappa specified",p:"MEDIUM"},
+      {n:"U06",c:"Control Fuses CF1/2 32A GE Fuselink",r:"GE brand specified",p:"HIGH"},
+      {n:"U07",c:"Hoist Fuse F1 32A",r:"32A HRC GE/Siemens",p:"HIGH"},
+      {n:"U08",c:"OL Relay OL-1 2.5–4.0A",r:"Per motor FLA",p:"HIGH"},
+      {n:"U09",c:"Hoist LS1/LS2 10A JAI-Balaji",r:"Lever type IP55",p:"HIGH"},
+      {n:"U10",c:"CT Limit Switches 5A JAI-Balaji",r:"2-way lever IP55",p:"HIGH"},
+      {n:"U11",c:"AC EM Disc Brakes (Fail-Safe)",r:"MH: 9.3kW | CT: 1.1kW",p:"HIGH"},
+      {n:"U12",c:"Brake Supply Panel (AC EM)",r:"415V AC to coils",p:"HIGH"},
+    ]},
+    {name:"25t EH-003 Hoist (UHF)",area:"Mill/ID Fan Area",uhf:true,slots:[
+      {n:"U01",c:"Main Contactor (MC) 38A",r:"38A, AC-3",p:"HIGH"},
+      {n:"U02",c:"Hoist Contactors H/L 16A",r:"16A, AC-3",p:"HIGH"},
+      {n:"U03",c:"T&F Contactor 16A",r:"EH-003 specific",p:"HIGH"},
+      {n:"U04",c:"Load Relay (O/A) 50–80A",r:"Siemens – EH-003 OEM",p:"HIGH"},
+      {n:"U05",c:"Hoist Fuse F1 125A Fuselink",r:"For 9.3kW motor",p:"HIGH"},
+      {n:"U06",c:"OL Relay OL-1 16–25A",r:"EH-003 specific range",p:"HIGH"},
+      {n:"U07",c:"OL Relay OL-2 2.5–4.0A",r:"CT motor range",p:"MEDIUM"},
+      {n:"U08",c:"Hoist LS1/LS2 10A JAI-Balaji",r:"Lever type IP55",p:"HIGH"},
+      {n:"U09",c:"AC EM Disc Brakes (Fail-Safe)",r:"MH: 9.3kW | CT: 1.1kW",p:"HIGH"},
+      {n:"U10",c:"Pendant Station Type-2 (4-way)",r:"UHF/Trisect IP55",p:"MEDIUM"},
+    ]},
+    {name:"DSL Mill Crane System (UHF Conductix)",area:"25t USC-002 Mill Crane Travel",uhf:true,slots:[
+      {n:"U01",c:"DSL Bus-Bar Track 30kW",r:"Conductix, 415V AC 3Ph",p:"HIGH"},
+      {n:"U02",c:"SFU 32A at DSL Feed Points",r:"Siemens/GE, 3-pole",p:"HIGH"},
+      {n:"U03",c:"Festoon Cable + Trolley (UE-25)",r:"JS:9968 30M/2.5mm×4c",p:"HIGH"},
+      {n:"U04",c:"Fixed DSL Supply Cable ×6",r:"JS:9968 Polycab/Universal",p:"MEDIUM"},
+      {n:"U05",c:"Rope Clamp + SFU + Bracket",r:"4 clamps + 1 strainer/set",p:"MEDIUM"},
+      {n:"U06",c:"Crane Interlock IMM-009+IMF-010",r:"UHF OEM ONLY – 18 sets",p:"HIGH"},
+      {n:"U07",c:"E-Stop – UHF Pendant Built-in",r:"40mm mushroom, NC, IP55",p:"HIGH"},
+    ]},
+  ];
+  document.getElementById('rack-container').innerHTML=cranes.map(crane=>`
+    <div class="rack-unit">
+      <div class="ru-hdr">
+        <h4>${crane.name}${crane.uhf?' <span class="badge bb" style="font-size:8px;margin-left:4px">UHF</span>':''}</h4>
+        <span class="badge bt" style="font-size:8px">${crane.area}</span>
+      </div>
+      <div class="ru-slots">
+        ${crane.slots.map(s=>`
+          <div class="slot${crane.uhf?' uhf-slot':''}">
+            <span class="snum">${s.n}</span>
+            <span class="sled ${priLed(s.p)}"></span>
+            <span class="sname">${s.c}</span>
+            <span class="srat">${s.r}</span>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ─── VENDORS TABLE ─────────────────────────────────────────────────────────
+function renderVendors(){
+  document.getElementById('vendor-tbody').innerHTML=vendors.map((v,i)=>`<tr>
+    <td style="font-weight:500;font-size:11px">${v[0]}</td>
+    <td style="font-size:10px;color:var(--text2)">${v[1]}</td>
+    <td style="font-size:10px;color:var(--text3)">${v[2]}</td>
+  </tr>`).join('');
+}
+
+// ─── NAVIGATION ────────────────────────────────────────────────────────────
+function nav(p){
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('panel-'+p).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if(p==='motors')renderMotors();
+  if(p==='brakes')renderBrakes();
+  if(p==='control')renderControl();
+  if(p==='auxiliary')renderAux();
+  if(p==='rack')renderRack();
+  if(p==='procurement')renderVendors();
+}
+
+// ─── MODAL ─────────────────────────────────────────────────────────────────
+function showMod(r){
+  document.getElementById('mod-title').textContent=r.comp||r.eq||r.type||'Detail';
+  document.getElementById('mod-sub').textContent=r.app||r.cat||'';
+  document.getElementById('mod-props').innerHTML=Object.entries(r).filter(([k,v])=>v&&v!=='—').map(([k,v])=>`<span class="pk">${k.replace(/_/g,' ')}</span><span class="pv">${v}</span>`).join('');
+  document.getElementById('mod-bg').classList.add('open');
+}
+function closeMod(e){if(!e||e.target===document.getElementById('mod-bg'))document.getElementById('mod-bg').classList.remove('open');}
+
+// ─── AI EXPERT ─────────────────────────────────────────────────────────────
+let aiHist=[];
+async function sendAI(){
+  const inp=document.getElementById('ai-inp');
+  const txt=inp.value.trim();if(!txt)return;
+  inp.value='';addMsg('user',txt);
+  aiHist.push({role:'user',content:txt});
+  const tid=addTyping();
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:AI_CTX,messages:aiHist})
+    });
+    const data=await resp.json();
+    removeTyping(tid);
+    const reply=data.content?.[0]?.text||'Unable to get response. Please retry.';
+    addMsg('ai',reply);aiHist.push({role:'assistant',content:reply});
+    if(aiHist.length>20)aiHist=aiHist.slice(-20);
+  }catch(e){removeTyping(tid);addMsg('ai','Connection error. Check network and retry.');}
+}
+function sendQ(t){document.getElementById('ai-inp').value=t;sendAI();}
+function addMsg(role,txt){
+  const c=document.getElementById('ai-msgs'),d=document.createElement('div');
+  d.className='msg '+role;
+  const fmt=txt.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>');
+  d.innerHTML=`<div class="mav ${role}">${role==='ai'?'AI':'YOU'}</div><div class="mb">${fmt}</div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+let tc=0;
+function addTyping(){
+  const c=document.getElementById('ai-msgs'),id='typ-'+(++tc),d=document.createElement('div');
+  d.className='msg';d.id=id;
+  d.innerHTML=`<div class="mav ai">AI</div><div class="mb"><span class="tdot"></span><span class="tdot"></span><span class="tdot"></span></div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;return id;
+}
+function removeTyping(id){const e=document.getElementById(id);if(e)e.remove();}
+document.getElementById('ai-inp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAI();}});
+
+// ─── RCA GENERATOR ─────────────────────────────────────────────────────────
+function genRCA(){
+  const eq=document.getElementById('r-eq').value||'[Equipment]';
+  const tag=document.getElementById('r-tag').value||'[TAG]';
+  const dt=document.getElementById('r-date').value||new Date().toISOString().split('T')[0];
+  const type=document.getElementById('r-type').value;
+  const prob=document.getElementById('r-prob').value||'[Describe failure]';
+  const obs=document.getElementById('r-obs').value||'[Physical observations]';
+  const imp=document.getElementById('r-imp').value||'Under assessment';
+  const saf=document.getElementById('r-saf').value;
+  document.getElementById('rca-out').innerHTML=`<div class="tw" style="padding:16px;font-size:12px;line-height:1.8">
+    <div class="th" style="padding:0 0 10px;margin-bottom:14px"><h3>RCA Report — Template A</h3><span class="badge ba">${type}</span></div>
+    <div class="pg2">
+      <span class="pk">Equipment / System</span><span class="pv ca" style="font-family:var(--mono)">${eq} | ${tag}</span>
+      <span class="pk">Incident Date</span><span class="pv">${dt}</span>
+      <span class="pk">Failure Type</span><span class="pv">${type}</span>
+      <span class="pk">Problem Statement</span><span class="pv">${prob}</span>
+      <span class="pk">Initial Observations</span><span class="pv">${obs}</span>
+      <span class="pk">Immediate Containment</span><span class="pv">1. Issue LOTO / Positive Isolation — verify Zero Energy state (voltage, pressure, mechanical).<br>2. Notify shift in-charge & EMD control room.<br>3. Raise PTW & mobilize maintenance team.<br>4. Assess partial generation recovery on alternate equipment.</span>
+      <span class="pk">Root Cause (5-Why)</span><span class="pv">Why 1: <em>Failure symptom as reported.</em><br>Why 2: <em>Immediate physical cause (insulation breakdown, mechanical wear, overload).</em><br>Why 3: <em>Root technical trigger (coolant loss, vibration, contamination, VFD parameter mismatch).</em><br>Why 4: <em>Management gap (PM not executed, spare not procured, inspection missed).</em><br>Why 5: <em>System-level root cause (SOP gap, training deficit, vendor quality, design deficiency).</em></span>
+      <span class="pk">CAPA</span><span class="pv"><strong>Corrective:</strong> Replace failed component per correct spec (NTPC AVL). Conduct IR test pre-energisation. Re-commission per OEM checklist.<br><strong>Preventive:</strong> Update PM schedule. Raise PR for critical spare. Revise HIRA. Conduct DBT on identified hazard.</span>
+      <span class="pk">Safety Assessment</span><span class="pv"><span class="badge ${saf==='No Safety Incident'?'bg':'br'}">${saf}</span> | Generation Impact: ${imp}</span>
+    </div>
+    <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);font-family:var(--mono)">NTPC NKSTPP — EMD — DGM: Manash Kumar Mitra | IE Rules / CEA Regulations / NTPC Safety Policy</div>
+  </div>`;
+}
+
+// ─── PROCUREMENT TOOL ──────────────────────────────────────────────────────
+function genPR(){
+  const mat=document.getElementById('p-mat').value||'[Material]';
+  const asset=document.getElementById('p-asset').value;
+  const rsn=document.getElementById('p-rsn').value;
+  const stk=document.getElementById('p-stk').value||'NIL';
+  const qty=document.getElementById('p-qty').value||'TBD';
+  const tech=document.getElementById('p-tech').value||'[Technical justification]';
+  const risk=document.getElementById('p-risk').value||'[Risk if delayed]';
+  document.getElementById('pr-out').innerHTML=`<div class="tw" style="padding:16px;font-size:12px;line-height:1.8">
+    <div class="th" style="padding:0 0 10px;margin-bottom:14px"><h3>Procurement Justification — Template B</h3><span class="badge bg">${rsn}</span></div>
+    <div class="pg2">
+      <span class="pk">Material Description</span><span class="pv ca" style="font-weight:500">${mat}</span>
+      <span class="pk">Target Asset</span><span class="pv">${asset}</span>
+      <span class="pk">Reason</span><span class="pv">${rsn}</span>
+      <span class="pk">Current Inventory</span><span class="pv"><span class="badge ${stk==='NIL'||stk==='0'?'br':'ba'}">${stk}</span></span>
+      <span class="pk">Quantity Required</span><span class="pv" style="font-family:var(--mono)">${qty} nos.</span>
+      <span class="pk">Technical Justification</span><span class="pv">${tech}. Item must comply with NTPC AVL and meet OEM BOM/TDS specifications. Class F insulation minimum, IP55 protection, rated for S4 duty cycle, IE2/IE3 efficiency class as applicable.</span>
+      <span class="pk">Consequence of Non-Procurement</span><span class="pv"><span class="badge br">HIGH RISK</span> — ${risk}. Any generation loss at NKSTPP (3×660MW) has direct financial and PLF impact. Procurement delay directly threatens zero-downtime mandate of EMD department.</span>
+      <span class="pk">Compliance</span><span class="pv">IE Rules, CEA Regulations, NTPC Safety Policy, IS standards applicable to component category.</span>
+    </div>
+    <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);font-family:var(--mono)">NTPC NKSTPP — EMD — DGM: Manash Kumar Mitra | PSU Financial Prudence Guidelines</div>
+  </div>`;
+}
+
+// ─── EXPORT CSV ────────────────────────────────────────────────────────────
+function exportCSV(type){
+  const data={motors}[type];if(!data)return;
+  const keys=Object.keys(data[0]);
+  const csv=[keys.join(','),...data.map(r=>keys.map(k=>`"${r[k]}"`).join(','))].join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=`EMD_${type}_NKSTPP_Rev2.csv`;a.click();
+}
+
+// ─── INIT ───────────────────────────────────────────────────────────────────
+renderMotors();
+</script>
+</body>
+</html>

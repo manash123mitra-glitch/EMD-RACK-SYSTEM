@@ -1,18 +1,21 @@
 # EMD Electrical Rack System — NTPC NKSTPP
 
-**DGM Electrical Maintenance — North Karanpura Super Thermal Power Project**
+**DGM Electrical Maintenance: Manash Kumar Mitra | Revision 2 | March 2026**
 
-A comprehensive electrical engineering rack management system for the EMD department.
+AI-powered electrical spares procurement & rack management system for NTPC North Karanpura Super Thermal Power Project.
 
 ## Features
-- Motor Database (28 motors — all cranes & hoists)
-- Control Components Registry (VFDs, contactors, relays)
-- Brake Systems (DC disc, AC EM, AC EHT)
-- Auxiliary Components
-- Visual Rack View
-- AI Technical Expert (powered by Claude)
+- 162 line items | 297 installed population | 199 recommended spares
+- Motor Database (35 items — NTPC + UHF Mill Cranes)
+- Brake Systems (39 items — DC EM / AC EM / AC EHT)
+- Control Components (64 items — VFDs, contactors, fuses, limit switches)
+- Auxiliary & Drive (29 items — DSL system, festoon cables, UHF interlocks)
+- Visual Rack View (8 crane/hoist assemblies)
+- Procurement Summary & Vendor Shortlist
+- AI Technical Expert (Claude Sonnet 4)
 - RCA Generator (Template A)
 - Procurement Justification (Template B)
 
-## Technology
-Single-file HTML application — no server required.
+## Sources
+1. NTPC Approved TDS/BOM: 7100139820, 7100139821, Century/Reva/CGL/BBL/Mangla
+2. UHF Drawing Package: NORTH_KARANPURA__7__230724_152728.pdf (Universal Hoist-O-Fabrik)
