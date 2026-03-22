@@ -19,3 +19,4 @@ AI-powered electrical spares procurement & rack management system for NTPC North
 ## Sources
 1. NTPC Approved TDS/BOM: 7100139820, 7100139821, Century/Reva/CGL/BBL/Mangla
 2. UHF Drawing Package: NORTH_KARANPURA__7__230724_152728.pdf (Universal Hoist-O-Fabrik)
+3. Want to create procurement plan
