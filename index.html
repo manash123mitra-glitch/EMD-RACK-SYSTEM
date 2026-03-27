@@ -149,8 +149,8 @@ tbody td{padding:8px 12px;color:var(--text);vertical-align:middle}
       <div class="nav-item" onclick="nav('rack')"><span class="dot" style="background:var(--red)"></span>Rack View</div>
       <div class="nav-item" onclick="nav('procurement')"><span class="dot" style="background:var(--amber)"></span>Procurement Summary</div>
     </div>
-    <div class="sid-label" style="display: none;">Tools</div>
-    <div class="sid-sec" style="display: none;">
+    <div class="sid-label">Tools</div>
+    <div class="sid-sec">
       <div class="nav-item" onclick="nav('ai')"><span class="dot" style="background:var(--accent)"></span>AI Technical Expert</div>
       <div class="nav-item" onclick="nav('rca')"><span class="dot" style="background:var(--amber)"></span>RCA Generator</div>
       <div class="nav-item" onclick="nav('pr')"><span class="dot" style="background:var(--green)"></span>Procurement Tool</div>
@@ -300,9 +300,66 @@ tbody td{padding:8px 12px;color:var(--text);vertical-align:middle}
       </div>
     </div>
 
-    <div class="panel" id="panel-ai" style="padding:0"></div>
-    <div class="panel" id="panel-rca"></div>
-    <div class="panel" id="panel-pr"></div>
+    <div class="panel" id="panel-ai" style="padding:0">
+      <div class="ai-panel">
+        <div class="ai-msgs" id="ai-msgs">
+          <div class="msg"><div class="mav ai">AI</div><div class="mb"><strong>EMD Technical Expert — Online</strong><br><br>Namaste, Manash Kumar Mitra sir. I am your AI technical consultant for NTPC NKSTPP Electrical Maintenance.<br><br>I have full context of your Rev 2 procurement plan — all 162 line items across motors, brakes, control components, and auxiliary systems, including the UHF Mill Crane package (USC-001×2, USC-002×10, EH-003×2, EH-012×2), Yaskawa V1000 VFDs, Conductix DSL system, festoon cables, IMM-009/IMF-010 interlocks, and all NTPC safety protocols.<br><br>Ask me anything: VFD fault diagnosis, RCA, brake troubleshooting, motor sizing, LOTO procedures, DBT scripts, or procurement justifications.</div></div>
+        </div>
+        <div class="chips">
+          <span class="chip" onclick="sendQ('Yaskawa A1000 CIMR-AD4A0038 overcurrent fault on 30t permanent store EOT crane MH — step by step troubleshoot')">A1000 OC Fault – 30t</span>
+          <span class="chip" onclick="sendQ('RCA for EHT 200-34 thruster brake failure on 30t permanent store crane — thruster not releasing, load drops')">RCA: EHT 200-34 Failure</span>
+          <span class="chip" onclick="sendQ('Motor IR insulation test procedure for 9.3kW LHP motor on 15t HCSD pump house crane before energisation')">IR Test – LHP 9.3kW</span>
+          <span class="chip" onclick="sendQ('Yaskawa V1000 CIMR-VA4A0018 overvoltage OV fault on 15t CEP crane during lowering — causes and fix')">V1000 OV – CEP Crane</span>
+          <span class="chip" onclick="sendQ('Write LOTO procedure for replacing Yaskawa A1000 CIMR-AD4A0044 on BFP bridge crane')">LOTO – A1000 VFD</span>
+          <span class="chip" onclick="sendQ('Daily toolbox talk for working on 7.5t TAC house crane at height — DBT script with AHP hazards')">DBT: TAC House Crane</span>
+          <span class="chip" onclick="sendQ('AC EHT brake SMD160 maintenance checklist for 15t HCSD pump house crane — thruster oil, air gap, disc wear')">EHT SMD160 Maintenance</span>
+          <span class="chip" onclick="sendQ('DC disc brake rectifier output voltage low on 5t ash slurry pump house crane — diagnosis and rectification')">DC Brake Rectifier – Ash Crane</span>
+          <span class="chip" onclick="sendQ('UHF EH-003 hoist load relay tripped — systematic fault-finding approach')">EH-003 Load Relay</span>
+          <span class="chip" onclick="sendQ('Write procurement justification for 1 no. Yaskawa A1000 CIMR-AD4A0038 VFD for 30t permanent store crane')">Procure: A1000 VFD</span>
+        </div>
+        <div class="ai-input-wrap">
+          <textarea class="ai-input" id="ai-inp" rows="2" placeholder="Ask any electrical engineering question... (Enter to send, Shift+Enter for new line)"></textarea>
+          <button class="ai-send" onclick="sendAI()">Send ↗</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-rca">
+      <div class="ph"><h1>// RCA Generator</h1><p>Root Cause Analysis — NTPC Template A format</p></div>
+      <div class="tw" style="padding:18px">
+        <div class="th" style="padding:0 0 10px"><h3>New RCA Report</h3></div>
+        <div class="fgrid">
+          <div class="fg"><label>Equipment Name</label><input id="r-eq" placeholder="e.g. 15t DG EOT Crane MH Motor"></div>
+          <div class="fg"><label>Tag Number</label><input id="r-tag" placeholder="e.g. CR-01-MH-001"></div>
+          <div class="fg"><label>Incident Date</label><input id="r-date" type="date"></div>
+          <div class="fg"><label>Failure Type</label><select id="r-type"><option>Motor Failure</option><option>Brake Failure</option><option>VFD/Drive Trip</option><option>Contactor Failure</option><option>Limit Switch Failure</option><option>OL Relay Trip</option><option>Cable Fault</option><option>Rectifier Failure</option><option>DSL/Festoon Fault</option><option>UHF Interlock Failure</option><option>Other</option></select></div>
+          <div class="fg" style="grid-column:1/-1"><label>Problem Statement</label><input id="r-prob" placeholder="Describe the failure clearly..."></div>
+          <div class="fg" style="grid-column:1/-1"><label>Initial Observations</label><input id="r-obs" placeholder="Abnormal sound, heat, smell, vibration, tripping..."></div>
+          <div class="fg"><label>Generation Impact</label><input id="r-imp" placeholder="kW / downtime hours"></div>
+          <div class="fg"><label>Safety Incident?</label><select id="r-saf"><option>No Safety Incident</option><option>Near Miss</option><option>Minor Injury</option><option>PTW Violation</option></select></div>
+        </div>
+        <button class="btn" onclick="genRCA()">Generate RCA Report ↗</button>
+      </div>
+      <div id="rca-out" style="margin-top:18px"></div>
+    </div>
+
+    <div class="panel" id="panel-pr">
+      <div class="ph"><h1>// Procurement Justification</h1><p>Template B — NTPC/PSU Technical Procurement Justification</p></div>
+      <div class="tw" style="padding:18px">
+        <div class="th" style="padding:0 0 10px"><h3>New Procurement Request</h3></div>
+        <div class="fgrid">
+          <div class="fg" style="grid-column:1/-1"><label>Material Description</label><input id="p-mat" placeholder="Exact technical name and specifications..."></div>
+          <div class="fg"><label>Target Asset</label><select id="p-asset"><option>10t DG Gantry Crane (Raw Water PH)</option><option>15t DG EOT Crane (Intake Well)</option><option>15t CEP Under-Slung Crane</option><option>12t SG Under-Slung Crane</option><option>2t Monorail Hoist</option><option>2.5t Monorail Hoist</option><option>5t Monorail Hoist</option><option>7.5t Monorail Hoist</option><option>17.5t TWH (ID Fan)</option><option>20t TWH (PAFD Fan)</option><option>35t Consolidated Hoist</option><option>25t USC-001 (UHF)</option><option>25t USC-002 ×10 (UHF)</option><option>25t EH-003 (UHF)</option><option>1t EH-012 (UHF)</option><option>DSL Mill Crane System</option></select></div>
+          <div class="fg"><label>Reason</label><select id="p-rsn"><option>Critical Breakdown Replacement</option><option>Routine Replenishment (Min. Stock)</option><option>LED Retrofit Project</option><option>Preventive Maintenance Spares</option><option>Capital Procurement</option></select></div>
+          <div class="fg"><label>Current Stock Level</label><input id="p-stk" placeholder="e.g. 0 nos. / 1 no. in pipeline"></div>
+          <div class="fg"><label>Quantity Required</label><input id="p-qty" placeholder="e.g. 2 nos."></div>
+          <div class="fg" style="grid-column:1/-1"><label>Technical Justification</label><input id="p-tech" placeholder="Why this specific specification is required..."></div>
+          <div class="fg" style="grid-column:1/-1"><label>Consequence of Non-Procurement</label><input id="p-risk" placeholder="Downtime risk, generation loss, safety hazard..."></div>
+        </div>
+        <button class="btn" onclick="genPR()">Generate Justification ↗</button>
+      </div>
+      <div id="pr-out" style="margin-top:18px"></div>
+    </div>
 
   </div></div><div class="modal-bg" id="mod-bg" onclick="closeMod(event)">
   <div class="modal" id="mod-content">
@@ -313,10 +370,32 @@ tbody td{padding:8px 12px;color:var(--text);vertical-align:middle}
 </div>
 
 <script>
-const API_KEY='';
-const AI_CTX='';
+const API_KEY='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';
+const AI_CTX=`You are an expert Electrical Reliability Engineer for Manash Kumar Mitra, DGM Electrical Maintenance, NTPC North Karanpura (NKSTPP), 3×660MW thermal power plant. You have COMPLETE knowledge from all site source documents (extracted text files from actual NTPC TDS/BOM drawings):
 
-// ─── DATA ─────────────────────────────────────────────────────────────────
+COMPLETE CRANE/HOIST FLEET (Rev 3 — All Source Docs):
+MAIN PLANT: 10t DG Gantry (4410-132A, Reva, Raw Water PH outdoor, Motors: 3.7kW MH+0.55kW CT+1.5kW LT, VVVF, AC EHT brake 100-18 6kgm), 15t DG EOT (4410-001-301B, Reva, Intake Well, 5.5kW MH+0.55kW CT+LT, VVVF, DC Disc Size-16 8.16kgm + EHT SMD160 20kgm), 15t CEP Under-Slung (4410-001-110-Y-010, Reva/BBL, Yaskawa V1000 CIMR-VA4A0018 5.5kW MH + VA4A0005 CT/LT, DC Disc Size-18 15.3kgm + Size-10 CT), 12t SG Under-Slung (4410-001-110-B-028, Century, 3.7kW MH+0.75kW CT, Pethe 195mm 8kgm MH+110mm CT), 35t Consolidated (4410-001-102-Y-017, CGL ND160L 15kW/975rpm FLA30A + NG90S 0.75kW/950rpm, VVVF drive).
+AHP AREA (4410-162-PVM-Y-016, Reva Ind., LHP Motors, Doc 4403.x): 15t DG EOT HCSD PH (9.3kW/4P/1440 MH + 0.75kW CT + 1.1kW×2 LT, VVVF 11kW+1.5kW+1.5kW, Dual brake: DC Disc BDC100 9kgm + EHT SMD160 15.3kgm MH, DC Disc 0.41kgm CT, 0.82kgm LT, 63A TPN isolator, 350VA+2kVA transformers, 16-way pendant), 7.5t DG EOT TAC House (5.5kW MH + 0.55kW CT + 0.75kW×2 LT, VVVF 5.5kW+1.5kW+1.5kW, Dual brake EHT 100-18 6kgm + DC Disc 6.12kgm MH, DC Disc 0.41kgm CT), 5t SG EOT Ash Slurry PH ×3 (3.7kW MH+0.55kW CT, VVVF, DC Disc PEM165 6.12kgm + PEM85 0.41kgm, 32A SFU), 5t SG EOT Ash Water PH (3.7kW MH+0.55kW CT, VVVF, same brakes, 32A SFU, 10-way pendant Vaishno), 3t SG EOT Fly Ash Silo (2.2kW MH+0.55kW CT, VVVF, DC Disc PEM150 3.2kgm + PEM85 0.41kgm, 32A SFU).
+30t PERMANENT STORE EOT (4410-001-110-PVM-Y-251, Alpha Services, Indoor, Span 11.7m): MH 13kW/970rpm Yaskawa A1000 CIMR-AD4A0038, CT 0.55kW A1000 AD4A0005, LT 0.55kW×2 A1000 AD4A0011. Dual brake MH: EHT 200-34 (32kgm) + EMDC Size-20 (26.5kgm). CT/LT: EHT 100-18 (6kgm). DSL: Cu 250A. Control transformers: 500VA 415/110V×2 + 2.5kVA lighting + 500VA 24V hand lamp.
+BFP MONORAIL/CRANE (4410-001-110-PVM-Y-250, Alpha Services): 2.2kW hoist: A1000 CIMR-AD4A0007; 0.37kW CTM: AD4A0004. Large 13kW type: A1000 CIMR-AD4A0044 (18.5kW drive), CT AD4A0005, LT AD4A0011. All inverter duty VPI insulation.
+HOISTS (7100139820, UHF Thane): 2t UE-2 (3.7kW/5HP 6P, 0.55kW CT), 2.5t (3.7kW MH), 5t (3.7kW MH), 7.5t UE-7.5 (7.5kW 6P 132M, 1.1kW CT), 10t×2 (9.3kW 6P 160M, 1.1kW CT), all AC EM disc brake Pethe/Duplex, DSL cable-trolley type, power 415V/control 110V, SE/Kappa 100VA transformer, Siemens/GE contactors, GE HRC fuses, Siemens/L&T OL relays, BCH/JAI-Balaji limit switches, Rittal/Pyrotech panel.
+UNDER-HUNG TWH (7100139821, UHF Thane): 17.5t+20t, 9.3kW 6P 160M MH + 1.1kW 90L CT×2, AC EM Disc Pethe/EMCO, 100A contactors, SE/Kappa 200VA transformer, 100A HRC fuses.
+UHF MILL CRANES: USC-001×2 (25t/4.665m), USC-002×10 (25t/5.3m), EH-003×2 (25t/12m), EH-012×2. Motors: 9.3kW 6P 160M MH + 1.1kW 90L CT. Conductix DSL 30kW bus-bar. IMM-009 (18 male) + IMF-010 (18 female) crane interlocks. Elmex terminals. Rittal panels IP56. SFU200A.
+
+MOTORS (all crane duty): BBL frames 90L(1.1kW/1.5kW), 112M(3.7kW), 132M(7.5kW), 160M(9.3kW). CGL ND160L(15kW/975rpm, FLA30A, frame dim: 250mm), NG90S(0.75kW/950rpm, FLA2.03A). LHP 4P series: 9.3kW/1440, 5.5kW, 3.7kW, 2.2kW, 0.75kW, 0.55kW. ALL: 415V 3Ph 50Hz, TEFC IP55, Class F insulation, temp rise limited to Class B (70°C over 50°C ambient), S4 40% CDF 150 st/hr, inverter duty VPI, pull-out torque 275% FLT.
+
+BRAKES: DC EM Disc Pethe/EMCO: 195mm(8kgm), 230mm(14kgm), Size-16/BDC100(8.16kgm), Size-14/PEM165(6.12kgm), Size-18(15.3kgm), Size-10(1.6kgm), Size-8/PEM85(0.82kgm), Size-08 CT(0.41kgm), PEM150(3.2kgm). AC EHT Electromag/Reva: 100-18(6kgm), SMD160×235(20kgm), 200-34(32kgm). EMDC20 disc(26.5kgm). Brake rectifier: 415VAC→190VDC. Service factors: MH 150%, CT/LT 125%.
+
+CONTROL PANELS (from SLD/BOM drawings): TPN Isolators 32A/63A (L&T/Siemens). Main contactors 32A-45A/110V. Hoist fuses 20/16A–63/50A. CT/LT fuses 20/4A–20/6A. Transformer fuses 20/4A (pri) + 20/10A (sec). Control transformers 100-500VA 415/110V (SE/Kappa for UHF; per AVL for NTPC). OL relays 1.6–2.5A (CT), 8–25A (MH) Siemens/L&T. Limit switches BCH/JAI-Balaji/SOC snap-action + two-way lever. Brake contactors 9A/110V. Rectifiers 415V AC→190V DC. Pendants 10–16 way IP55 Vaishno/UHF. E-Stops 4A NC mushroom IP55. DBRs as per drive manual. Control relays 3CO/11-pin/110V.
+
+CABLES: MH motor: 3C×4sq.mm Cu (large cranes), 3C×2.5sq.mm Cu (small). CT/LT: 3C×2.5sq.mm. Pendant: 10C+10C×1.5sq.mm or 12C×1.5sq.mm. Fixed: 1C×1.5sq.mm. Isolator→DSL: 6sq.mm. 35t MH: 2×3C×35sq.mm. All: XLPE/EPR/PVC Cu 1100V, IS:9968 trailing/festoon. UHF festoon: JS:9968 30M/2.5sq.mm×4c. DSL: Shrouded BB GI 100A (Safetrack) for AHP cranes; Cu 250A for 30t.
+
+SAFETY: LOTO (IS:13947), PTW (permit-to-work hot/cold), CEA Regulations, IE Rules 2016, NTPC Safety Policy, HIRA, JSA, DBT (Daily Toolbox Talk), Arc Flash PPE (CAT2 min), IS:3177/807/3938/325/1231/2266, crane classification Cl-II (M5) all cranes, load test 125% SWC. Emergency: 24×7 EMD control room, 112 emergency, fire tender.
+
+Always structure responses: Safety → Assessment → Technical Steps → Preventive Actions. For RCA use 5-Why. For procurement cite drawing reference and NTPC AVL compliance.`;
+</script>
+
+<script>
 const motors=[
   {sno:1,eq:"2t Monorail Hoist",app:"APH/FOPH/PAFD Handling",type:"Motor–Hoist (MH)",kw:3.7,hp:5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"112M",pop:1,make:"BBL/Siemens/Kirloskar/Crompton/Marathon",ref:"7100139820",spare:1,pri:"HIGH",rem:"112M frame; critical lifting",uhf:false},
   {sno:2,eq:"2t Monorail Hoist",app:"APH/FOPH/PAFD Handling",type:"Motor–Cross Travel (CT)",kw:0.55,hp:0.75,volt:"415V 3Ph",poles:4,rpm:"~1440",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"90L",pop:1,make:"BBL/Siemens/Kirloskar/Crompton/Marathon",ref:"7100139820",spare:1,pri:"MEDIUM",rem:"Pool with 2.5t CT spare",uhf:false},
@@ -353,6 +432,7 @@ const motors=[
   {sno:33,eq:"25t EH-003 (×2)",app:"Mill/ID Fan Area",type:"Motor–Cross Travel (CT)",kw:1.1,hp:1.5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"Crane Duty,Cl-F",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:2,make:"Crompton Greaves / BBL / Marathon",ref:"EH-003 (UHF)",spare:1,pri:"MEDIUM",rem:"1 spare covers all CT in USC/EH series",uhf:true},
   {sno:34,eq:"1t EH-012 (×2)",app:"Auxiliary Light Duty",type:"Motor–Hoist (MH)",kw:0.37,hp:0.5,volt:"415V 3Ph",poles:6,rpm:"Not spec.",duty:"Crane Duty,Cl-F",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:2,make:"Crompton Greaves",ref:"EH-012 (UHF)",spare:1,pri:"MEDIUM",rem:"Light duty; small motor",uhf:true},
   {sno:35,eq:"1t EH-012 (×2)",app:"Auxiliary Light Duty",type:"Motor–Cross Travel (CT)",kw:0.15,hp:0.2,volt:"415V 3Ph",poles:6,rpm:"Not spec.",duty:"Crane Duty,Cl-F",enc:"TEFC IP55",ins:"Class F",frame:"As spec.",pop:2,make:"Crompton Greaves",ref:"EH-012 (UHF)",spare:1,pri:"LOW",rem:"Very small; low duty",uhf:true},
+  // ─── AHP AREA CRANES (4410-162-PVM-Y-016 | Reva Ind. | LHP Motors) ────────
   {sno:36,eq:"15t DG EOT Crane (HCSD PH)",app:"HCSD Pump House — AHP Area",type:"Motor–Hoist (MH)",kw:9.3,hp:12.5,volt:"415V 3Ph",poles:4,rpm:"1440",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F (Cl-B rise)",frame:"—",pop:1,make:"LHP (drg specified)",ref:"4410-162-PVM-Y-016 | Doc 4403.5",spare:1,pri:"HIGH",rem:"VVVF Drive 11kW; DC Disc Size-14 MH; AC EHT MH; DC Disc CT/LT",uhf:false,ahp:true},
   {sno:37,eq:"15t DG EOT Crane (HCSD PH)",app:"HCSD Pump House — AHP Area",type:"Motor–Cross Travel (CT)",kw:0.75,hp:1,volt:"415V 3Ph",poles:4,rpm:"1440",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"—",pop:1,make:"LHP",ref:"4410-162-PVM-Y-016",spare:1,pri:"MEDIUM",rem:"VVVF Drive 1.5kW; DC Disc brake Size-8 (0.82kgm)",uhf:false,ahp:true},
   {sno:38,eq:"15t DG EOT Crane (HCSD PH)",app:"HCSD Pump House — AHP Area",type:"Motor–Long Travel (LT)",kw:1.1,hp:1.5,volt:"415V 3Ph",poles:4,rpm:"1440",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"—",pop:2,make:"LHP",ref:"4410-162-PVM-Y-016",spare:2,pri:"MEDIUM",rem:"2 nos.; VVVF Drive 1.5kW; DC Disc brake Size-8",uhf:false,ahp:true},
@@ -365,9 +445,11 @@ const motors=[
   {sno:45,eq:"5t SG EOT Crane (Ash Water PH, 6.4m)",app:"Ash Water Pump House — AHP Area",type:"Motor–Cross Travel (CT)",kw:0.55,hp:0.75,volt:"415V 3Ph",poles:4,rpm:"1440",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"—",pop:1,make:"LHP",ref:"4410-162-PVM-Y-016",spare:1,pri:"MEDIUM",rem:"VVVF 1.5kW; DC Disc brake",uhf:false,ahp:true},
   {sno:46,eq:"3t SG EOT Crane (Fly Ash Silo Utility, 5.9m)",app:"Fly Ash Silo Utility Building — AHP",type:"Motor–Hoist (MH)",kw:2.2,hp:3,volt:"415V 3Ph",poles:4,rpm:"1440",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F (Cl-B rise)",frame:"—",pop:1,make:"LHP",ref:"4410-162-PVM-Y-016 | Doc 4403.7",spare:1,pri:"HIGH",rem:"VVVF 2.2kW; Isolator 32A; DC Disc MH (PEM150/3.2kgm); DC Disc CT (PEM85/0.41kgm)",uhf:false,ahp:true},
   {sno:47,eq:"3t SG EOT Crane (Fly Ash Silo Utility, 5.9m)",app:"Fly Ash Silo Utility Building — AHP",type:"Motor–Cross Travel (CT)",kw:0.55,hp:0.75,volt:"415V 3Ph",poles:4,rpm:"1440",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"—",pop:1,make:"LHP",ref:"4410-162-PVM-Y-016",spare:1,pri:"MEDIUM",rem:"VVVF 1.5kW; DC Disc brake",uhf:false,ahp:true},
+  // ─── 30t PERMANENT STORE EOT CRANE (4410-001-110-PVM-Y-251 | Alpha Services | Yaskawa A1000) ──
   {sno:48,eq:"30t Permanent Store EOT Crane",app:"Permanent Store (Indoor), Span 11.7m",type:"Motor–Hoist (MH, Micro)",kw:13,hp:17.5,volt:"415V 3Ph",poles:6,rpm:"970",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F (Cl-B rise)",frame:"—",pop:1,make:"ABB/Crompton/BBL/Marathon/Siemens/Kirloskar/NGEF",ref:"4410-001-110-PVM-Y-251-03",spare:1,pri:"HIGH",rem:"Yaskawa A1000 CIMR-AD4A0038 (15kW); VPI inverter duty; EHT(200-34)+EMDC20 dual brake; Alpha Services",uhf:false,ahp:true},
   {sno:49,eq:"30t Permanent Store EOT Crane",app:"Permanent Store (Indoor), Span 11.7m",type:"Motor–Cross Travel (CT)",kw:0.55,hp:0.75,volt:"415V 3Ph",poles:4,rpm:"910",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"—",pop:1,make:"ABB/Crompton/BBL/Marathon/Siemens",ref:"4410-001-110-PVM-Y-251-03",spare:1,pri:"MEDIUM",rem:"Yaskawa A1000 CIMR-AD4A0005 (1.5kW); AC EHT (100-18) brake 6kgm",uhf:false,ahp:true},
   {sno:50,eq:"30t Permanent Store EOT Crane",app:"Permanent Store (Indoor), Span 11.7m",type:"Motor–Long Travel (LT)",kw:0.55,hp:0.75,volt:"415V 3Ph",poles:4,rpm:"910",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"—",pop:2,make:"ABB/Crompton/BBL/Marathon/Siemens",ref:"4410-001-110-PVM-Y-251-03",spare:2,pri:"MEDIUM",rem:"2 nos.; Yaskawa A1000 CIMR-AD4A0011 (3.7kW); AC EHT (100-18) brake 6kgm",uhf:false,ahp:true},
+  // ─── BFP MONORAIL HOISTS (4410-001-110-PVM-Y-250 | Alpha Services | Yaskawa A1000) ────────────
   {sno:51,eq:"BFP Monorail Hoist (2.2kW type)",app:"BFP Area — Motor Wound Hoist",type:"Motor–Hoist (MH, Micro)",kw:2.2,hp:3,volt:"415V 3Ph",poles:6,rpm:"975",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"—",pop:1,make:"ABB/Crompton/BBL/Marathon/Siemens/Kirloskar/NGEF",ref:"4410-001-110-PVM-Y-250-03",spare:1,pri:"HIGH",rem:"Yaskawa A1000 CIMR-AD4A0007 (2.2kW); VPI inverter duty; 2 nos. 2.2kW HM motors + 2 nos. 0.37kW CTM per B-126 note",uhf:false,ahp:false},
   {sno:52,eq:"BFP Monorail Hoist (2.2kW type)",app:"BFP Area",type:"Motor–Cross Travel (CT)",kw:0.37,hp:0.5,volt:"415V 3Ph",poles:8,rpm:"—",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"—",pop:1,make:"ABB/Crompton/BBL/Marathon",ref:"4410-001-110-PVM-Y-250-03 / B-126",spare:1,pri:"MEDIUM",rem:"Yaskawa A1000 CIMR-AD4A0004 (0.75kW); 8-pole CT motor",uhf:false,ahp:false},
   {sno:53,eq:"BFP Bridge Crane (13kW type)",app:"BFP Area — Large Hoist",type:"Motor–Hoist (MH, Micro)",kw:13,hp:17.5,volt:"415V 3Ph",poles:6,rpm:"970",duty:"S4,40%CDF,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"—",pop:1,make:"ABB/Crompton/BBL/Marathon/Siemens/NGEF",ref:"4410-001-110-PVM-Y-250-03",spare:1,pri:"HIGH",rem:"Yaskawa A1000 CIMR-AD4A0044 (18.5kW rated drive); largest VFD in hoist fleet; VPI inverter duty",uhf:false,ahp:false},
@@ -415,6 +497,7 @@ const brakes=[
   {sno:37,eq:"25t EH-003 (×2)",app:"Mill/ID Fan – Hoist",type:"AC EM Disc – Fail-Safe",cat:"Hoist (MH)",size:"Per 9.3kW motor",torq:"Calc.",sf:"150% FLT",pop:2,make:"Pethe/EMCO/Universal",ref:"EH-003 (UHF)",spare:1,pri:"HIGH",rem:"Confirm exact disc/coil size from EH-003 drawing",uhf:true},
   {sno:38,eq:"25t EH-003 (×2)",app:"Mill/ID Fan – CT",type:"AC EM Disc – Fail-Safe",cat:"Cross Travel (CT)",size:"Per 1.1kW motor",torq:"Calc.",sf:"125% FLT",pop:2,make:"Pethe/EMCO/Universal",ref:"EH-003 (UHF)",spare:1,pri:"MEDIUM",rem:"2 nos.",uhf:true},
   {sno:39,eq:"1t EH-012 (×2)",app:"Aux Light Duty Hoist",type:"AC EM Disc – Fail-Safe",cat:"Hoist (MH)",size:"Per 0.37kW motor",torq:"Calc.",sf:"Not spec.",pop:2,make:"Pethe/EMCO/Universal",ref:"EH-012 (UHF)",spare:1,pri:"MEDIUM",rem:"Small brake; low wear rate",uhf:true},
+  // ─── AHP AREA BRAKES (4410-162-PVM-Y-016 | Reva | EMCO/SOC) ──────────────
   {sno:40,eq:"15t DG EOT Crane (HCSD PH)",app:"HCSD PH — Hoist MH (Dual Brake)",type:"DC EM Disc (Fail-Safe)",cat:"Hoist (MH)",size:"Size-14 (BDC100)",torq:9,sf:"150% FLT",pop:1,make:"EMCO/SOC",ref:"4410-162-Y-016 | Doc 4403.5",spare:1,pri:"HIGH",rem:"BDC100 disc brake 9kgm; in series with EHT for fail-safe dual arrest",uhf:false,ahp:true},
   {sno:41,eq:"15t DG EOT Crane (HCSD PH)",app:"HCSD PH — Hoist MH (AC EHT)",type:"AC EHT (Electro-Hydraulic Thruster)",cat:"Hoist (MH)",size:"SMD160×235",torq:15.3,sf:"150% FLT",pop:1,make:"EMCO/SOC/Electromag",ref:"4410-162-Y-016",spare:1,pri:"HIGH",rem:"EHT thruster + disc; stock hydraulic oil, coil, disc separately; 9+15.3=24.3kgm total",uhf:false,ahp:true},
   {sno:42,eq:"15t DG EOT Crane (HCSD PH)",app:"HCSD PH — Cross Travel",type:"DC EM Disc (Fail-Safe)",cat:"Cross Travel (CT)",size:"Size-8 (PEM85/GCB100)",torq:0.41,sf:"125% FLT",pop:1,make:"EMCO/Pethe/SOC",ref:"4410-162-Y-016",spare:1,pri:"MEDIUM",rem:"0.41kgm CT brake",uhf:false,ahp:true},
@@ -428,6 +511,7 @@ const brakes=[
   {sno:50,eq:"5t SG EOT Crane (Ash Water PH, 6.4m)",app:"Ash Water PH — Cross Travel",type:"DC EM Disc (Fail-Safe)",cat:"Cross Travel (CT)",size:"Size-06 (PEM85)",torq:0.41,sf:"125% FLT",pop:1,make:"EMCO/Pethe/SOC",ref:"4410-162-Y-016",spare:1,pri:"MEDIUM",rem:"",uhf:false,ahp:true},
   {sno:51,eq:"3t SG EOT Crane (Fly Ash Silo)",app:"Fly Ash Silo — Hoist MH",type:"DC EM Disc (Fail-Safe)",cat:"Hoist (MH)",size:"12 or PEM150",torq:3.2,sf:"150% FLT",pop:1,make:"EMCO/Pethe/SOC",ref:"4410-162-Y-016 | Doc 4403.7",spare:1,pri:"HIGH",rem:"3.2kgm; 2.2kW hoist; EMCO make",uhf:false,ahp:true},
   {sno:52,eq:"3t SG EOT Crane (Fly Ash Silo)",app:"Fly Ash Silo — Cross Travel",type:"DC EM Disc (Fail-Safe)",cat:"Cross Travel (CT)",size:"Size-06 (PEM85)",torq:0.41,sf:"125% FLT",pop:1,make:"EMCO/Pethe/SOC",ref:"4410-162-Y-016",spare:1,pri:"MEDIUM",rem:"0.41kgm",uhf:false,ahp:true},
+  // ─── 30t PERMANENT STORE EOT CRANE BRAKES (4410-001-110-Y-251 | Alpha Services) ───────────────
   {sno:53,eq:"30t Permanent Store EOT Crane",app:"Perm. Store — Main Hoist (Primary)",type:"AC EHT (Electro-Hydraulic Thruster)",cat:"Hoist (MH)",size:"200-34",torq:32,sf:"150% FLT",pop:1,make:"Electromag/SOC/EMCO/BCH/KAKKU",ref:"4410-001-110-PVM-Y-251-03",spare:1,pri:"HIGH",rem:"EHT 200-34 (32kgm) primary brake; actual required 22.27kgm; stock thruster coil + oil",uhf:false,ahp:true},
   {sno:54,eq:"30t Permanent Store EOT Crane",app:"Perm. Store — Main Hoist (Secondary)",type:"DC EM Disc (Fail-Safe) — EMDC",cat:"Hoist (MH)",size:"EMDC Size-20",torq:26.5,sf:"150% FLT",pop:1,make:"EMCO/SOC/Electromag",ref:"4410-001-110-PVM-Y-251-03",spare:1,pri:"HIGH",rem:"Secondary DC disc 26.5kgm; EMDC20; combined dual brake 32+26.5kgm",uhf:false,ahp:true},
   {sno:55,eq:"30t Permanent Store EOT Crane",app:"Perm. Store — Cross Travel",type:"AC EHT (Electro-Hydraulic Thruster)",cat:"Cross Travel (CT)",size:"100-18",torq:6,sf:"125% FLT",pop:1,make:"Electromag/SOC/EMCO/BCH",ref:"4410-001-110-PVM-Y-251-03",spare:1,pri:"HIGH",rem:"EHT 100-18 (6kgm CT); actual required 0.84kgm",uhf:false,ahp:true},
@@ -475,6 +559,7 @@ const controls=[
   {sno:38,eq:"15t DG EOT Crane",app:"Floor Control",comp:"Pendant Pushbutton Station",rating:"16-way, IP55",volt:"110V AC",cat:"Control",pop:1,make:"Per AVL",ref:"4410-001-301B",spare:1,pri:"HIGH",rem:"16-way",uhf:false},
   {sno:39,eq:"15t CEP Under-Slung",app:"Floor Control",comp:"Pendant Pushbutton Station",rating:"12-way, IP55",volt:"110V AC",cat:"Control",pop:1,make:"Per AVL",ref:"4410-001-110-Y",spare:1,pri:"HIGH",rem:"12-way",uhf:false},
   {sno:40,eq:"All Cranes & Hoists",app:"Emergency Stop",comp:"E-Stop Pushbutton",rating:"40mm mushroom, NC, IP55",volt:"110V AC",cat:"Safety",pop:1,make:"Siemens/Telemecanique/L&T",ref:"All crane TDS",spare:4,pri:"HIGH",rem:"Keep 4 in stock",uhf:false},
+  // UHF
   {sno:41,eq:"All USC/EH (UHF)",app:"Incoming – USC-001/002",comp:"Main Switch 63A Isolator",rating:"63A, 3-pole TPN, lockable",volt:"415V AC",cat:"Isolation",pop:1,make:"Siemens/GE",ref:"ECD/USC-001 (UHF)",spare:1,pri:"HIGH",rem:"UHF circuit diagrams; 63A for 25t",uhf:true},
   {sno:42,eq:"EH-012 (UHF)",app:"Incoming – EH-012",comp:"Main Switch 25A Isolator",rating:"25A, 3-pole TPN, lockable",volt:"415V AC",cat:"Isolation",pop:1,make:"Siemens/GE",ref:"ECD/EH-012 (UHF)",spare:1,pri:"MEDIUM",rem:"25A for 1t hoist",uhf:true},
   {sno:43,eq:"All USC/EH (UHF)",app:"Main Feeder – USC",comp:"Main Contactor (MC) 16A",rating:"16A, AC-3",volt:"415V, Coil 110V",cat:"Contactor",pop:1,make:"Siemens/GE",ref:"ECD/USC-001 (UHF)",spare:2,pri:"HIGH",rem:"Frequent switching; keep 2",uhf:true},
@@ -499,6 +584,7 @@ const controls=[
   {sno:62,eq:"All UHF Control Panels",app:"Wiring Termination",comp:"Elmex Terminal Blocks 6mm²",rating:"6mm², screw type",volt:"—",cat:"Wiring",pop:"Req.",make:"Elmex (UHF specified)",ref:"All ECD (UHF)",spare:20,pri:"LOW",rem:"Elmex brand across all UHF drawings",uhf:true},
   {sno:63,eq:"All UHF Control Panels",app:"Status Indication",comp:"Indicating Lamp 110V AC LS type",rating:"110V AC, LS series",volt:"110V AC",cat:"Indication",pop:1,make:"Teknic/Siemens/Elemex",ref:"ECD/USC-001 (UHF)",spare:4,pri:"LOW",rem:"Keep R/Y/G assorted; 4 in stock",uhf:true},
   {sno:64,eq:"All UHF Control Panels",app:"Panel Enclosure (Rittal spec.)",comp:"Control Panel Enclosure IP55/IP56",rating:"IP55/IP56; double-compression glands",volt:"—",cat:"Enclosure",pop:1,make:"Rittal (UHF/CP-001 spec.)",ref:"UHF/CP-001 (UHF)",spare:0,pri:"LOW",rem:"Rittal specified; procure only if damaged",uhf:true},
+  // ─── AHP CRANES CONTROL PANEL BOM (from 4410-162-PVM-Y-016 Reva SLD/BOM) ─
   {sno:65,eq:"15t DG EOT Crane (HCSD PH)",app:"Incoming Isolation",comp:"TPN Isolator Switch",rating:"63A, TPN lockable",volt:"415V AC",cat:"Isolation",pop:1,make:"L&T / Siemens",ref:"4410-162-Y-016 | SLD 4403.5",spare:1,pri:"MEDIUM",rem:"Tag: 1A1 / 1A2; 2 nos. isolators (main+corner)",uhf:false,ahp:true},
   {sno:66,eq:"15t DG EOT Crane (HCSD PH)",app:"Main Power Contactor",comp:"Main Contactor (MC)",rating:"45A / 110V coil",volt:"415V AC / 110V ctrl",cat:"Contactor",pop:1,make:"Per NTPC QAP AVL",ref:"4410-162-Y-016",spare:1,pri:"HIGH",rem:"Tag MC; 9A contactor (110V coil)",uhf:false,ahp:true},
   {sno:67,eq:"15t DG EOT Crane (HCSD PH)",app:"MH VVVF Drive",comp:"AC VVVF Drive – Main Hoist",rating:"11kW, 415V 3Ph",volt:"415V AC",cat:"Drive",pop:1,make:"Per NTPC QAP AVL",ref:"4410-162-Y-016 | Tag 2D1",spare:0,pri:"HIGH",rem:"11kW drive for 9.3kW MH motor; Reva scope",uhf:false,ahp:true},
@@ -520,22 +606,27 @@ const controls=[
   {sno:83,eq:"15t DG EOT Crane (HCSD PH)",app:"Gravity Limit Switch",comp:"Gravity Limit Switch (GLS)",rating:"3A contact rating",volt:"110V AC",cat:"Limit Switch",pop:1,make:"Per NTPC QAP AVL",ref:"4410-162-Y-016",spare:1,pri:"HIGH",rem:"Tag GLS; critical over-hoist protection",uhf:false,ahp:true},
   {sno:84,eq:"15t DG EOT Crane (HCSD PH)",app:"Hoist Upper/Lower Limit",comp:"Snap Action Limit Switch (2LS1)",rating:"Two-way, 3A, IP55",volt:"110V AC",cat:"Limit Switch",pop:1,make:"BCH/JAI-Balaji/SOC",ref:"4410-162-Y-016",spare:1,pri:"HIGH",rem:"Snap action + gravity for dual protection",uhf:false,ahp:true},
   {sno:85,eq:"15t DG EOT Crane (HCSD PH)",app:"Emergency Stop",comp:"E-Stop Mushroom (2ES1 + ES1-ES4)",rating:"4A, NC contact, IP55",volt:"110V AC",cat:"Safety",pop:5,make:"Siemens/Telemecanique/L&T",ref:"4410-162-Y-016",spare:2,pri:"HIGH",rem:"5 E-stop buttons total; mushroom turn-to-release; safety critical",uhf:false,ahp:true},
+  // 7.5t TAC House
   {sno:86,eq:"7.5t DG EOT Crane (TAC House)",app:"Incoming Isolation",comp:"TPN Isolator Switch",rating:"63A, TPN lockable",volt:"415V AC",cat:"Isolation",pop:1,make:"L&T / Siemens",ref:"4410-162-Y-016 | Doc 4403.6",spare:0,pri:"MEDIUM",rem:"Pool with 15t isolator spare",uhf:false,ahp:true},
   {sno:87,eq:"7.5t DG EOT Crane (TAC House)",app:"Main Hoist VVVF Drive",comp:"AC VVVF Drive – MH",rating:"5.5kW, 415V 3Ph",volt:"415V AC",cat:"Drive",pop:1,make:"Per NTPC QAP AVL",ref:"4410-162-Y-016 | Tag 2D1",spare:0,pri:"HIGH",rem:"5.5kW drive for 5.5kW MH motor; tag 2D1",uhf:false,ahp:true},
   {sno:88,eq:"7.5t DG EOT Crane (TAC House)",app:"CT/LT VVVF Drives",comp:"AC VVVF Drive – CT & LT",rating:"1.5kW each, 415V 3Ph",volt:"415V AC",cat:"Drive",pop:2,make:"Per NTPC QAP AVL",ref:"4410-162-Y-016 | Tags 4D1,5D1",spare:1,pri:"HIGH",rem:"1 spare covers both 1.5kW CT and LT drives",uhf:false,ahp:true},
   {sno:89,eq:"7.5t DG EOT Crane (TAC House)",app:"Pendant Station",comp:"Pendant Station (PBS)",rating:"16-way, IP55",volt:"110V AC",cat:"Pendant",pop:1,make:"Per NTPC QAP AVL",ref:"4410-162-Y-016",spare:1,pri:"HIGH",rem:"16-way pendant; RAL9002 paint; die-cast",uhf:false,ahp:true},
+  // 5t / 3t Ash Area cranes
   {sno:90,eq:"5t SG EOT Crane (Ash Areas) ×4",app:"Incoming Isolation",comp:"TPN SFU Switch",rating:"32A, TPN lockable",volt:"415V AC",cat:"Isolation",pop:4,make:"L&T / Siemens",ref:"4410-162-Y-016 | SLD 4403.1,2,3,4",spare:1,pri:"MEDIUM",rem:"1 spare covers all 4 Ash area cranes",uhf:false,ahp:true},
   {sno:91,eq:"5t SG EOT Crane (Ash Areas) ×4",app:"VVVF Drive – MH",comp:"AC VVVF Drive – 3.7kW",rating:"3.7kW, 415V 3Ph",volt:"415V AC",cat:"Drive",pop:4,make:"Per NTPC QAP AVL",ref:"4410-162-Y-016 | Tag 2D1",spare:1,pri:"HIGH",rem:"1 spare drive for all 4 ash cranes MH",uhf:false,ahp:true},
   {sno:92,eq:"5t SG EOT Crane (Ash Areas) ×4",app:"VVVF Drive – CT",comp:"AC VVVF Drive – 1.5kW",rating:"1.5kW, 415V 3Ph",volt:"415V AC",cat:"Drive",pop:4,make:"Per NTPC QAP AVL",ref:"4410-162-Y-016 | Tag 4D1",spare:1,pri:"HIGH",rem:"1 spare covers all 4 CT drives",uhf:false,ahp:true},
   {sno:93,eq:"5t/3t SG EOT Cranes (Ash Areas)",app:"Brake Rectifiers",comp:"Brake Rectifier (2RC1, 4RC1)",rating:"415V AC→190V DC",volt:"415VAC/190VDC",cat:"Rectifier",pop:10,make:"Per NTPC QAP AVL",ref:"4410-162-Y-016",spare:2,pri:"HIGH",rem:"2 per crane; 5 cranes = 10 total; keep 2 spares",uhf:false,ahp:true},
   {sno:94,eq:"5t/3t SG EOT Cranes (Ash Areas)",app:"Pendant Station",comp:"Pendant Station (PBS)",rating:"10-way, IP55",volt:"110V AC",cat:"Pendant",pop:5,make:"Vaishno/Per NTPC QAP AVL",ref:"4410-162-Y-016",spare:1,pri:"HIGH",rem:"10-way pendant; Vaishno make per drg; die-cast aluminium",uhf:false,ahp:true},
   {sno:95,eq:"3t SG EOT Crane (Fly Ash Silo)",app:"VVVF Drive – MH",comp:"AC VVVF Drive – 2.2kW",rating:"2.2kW, 415V 3Ph",volt:"415V AC",cat:"Drive",pop:1,make:"Per NTPC QAP AVL",ref:"4410-162-Y-016 | Tag 2D1",spare:0,pri:"HIGH",rem:"2.2kW MH drive; pool with 3t elevator if compatible",uhf:false,ahp:true},
+  // 30t Permanent Store EOT Crane control
   {sno:96,eq:"30t Permanent Store EOT Crane",app:"MH VVVF Drive (Yaskawa A1000)",comp:"Yaskawa A1000 CIMR-AD4A0038",rating:"15kW rated / 13kW motor",volt:"415V AC",cat:"Drive",pop:1,make:"Yaskawa (OEM only)",ref:"4410-001-110-PVM-Y-251-03",spare:1,pri:"HIGH",rem:"OEM Yaskawa only; CIMR-AD4A0038; Open Loop Vector; crane duty parameters",uhf:false,ahp:true},
   {sno:97,eq:"30t Permanent Store EOT Crane",app:"CT VVVF Drive (Yaskawa A1000)",comp:"Yaskawa A1000 CIMR-AD4A0005",rating:"1.5kW rated / 0.55kW motor",volt:"415V AC",cat:"Drive",pop:1,make:"Yaskawa (OEM only)",ref:"4410-001-110-PVM-Y-251-03",spare:0,pri:"HIGH",rem:"Pool with BFP CIMR-AD4A0005",uhf:false,ahp:true},
   {sno:98,eq:"30t Permanent Store EOT Crane",app:"LT VVVF Drive (Yaskawa A1000)",comp:"Yaskawa A1000 CIMR-AD4A0011",rating:"3.7kW rated / 0.55kW LT motor",volt:"415V AC",cat:"Drive",pop:1,make:"Yaskawa (OEM only)",ref:"4410-001-110-PVM-Y-251-03",spare:0,pri:"HIGH",rem:"Pool with BFP CIMR-AD4A0011",uhf:false,ahp:true},
   {sno:99,eq:"30t Permanent Store EOT Crane",app:"Control Transformers",comp:"Control Transformer 415/110V + 415/24V + 415/240V",rating:"500VA (ctrl) + 500VA (hand lamp) + 2.5kVA (lighting)",volt:"415V AC",cat:"Transformer",pop:4,make:"Per NTPC QAP AVL",ref:"4410-001-110-PVM-Y-251-03",spare:1,pri:"MEDIUM",rem:"Standby transformer provided for 415/110V control circuit",uhf:false,ahp:true},
   {sno:100,eq:"30t Permanent Store EOT Crane",app:"Pendant Station",comp:"Pendant Push Button Station",rating:"Per NTPC spec; IP55",volt:"110V AC",cat:"Pendant",pop:1,make:"Per NTPC QAP AVL",ref:"4410-001-110-PVM-Y-251-03",spare:1,pri:"HIGH",rem:"16-way pendant; crane duty; SIL2 E-Stop",uhf:false,ahp:true},
-];const auxiliaries=[
+];
+
+const auxiliaries=[
   {sno:1,eq:"12t SG / 2t & 5t EWRH",app:"DC Supply for Brake Coils",comp:"Brake Rectifier Panel",rating:"415V AC → DC output",volt:"415V AC/DC",pop:4,make:"Per AVL",ref:"4410-001-110-B-028",spare:1,pri:"HIGH",rem:"Critical – no rectifier = brakes dead",uhf:false},
   {sno:2,eq:"10t DG Gantry Crane",app:"DC Supply for DC Disc Brakes",comp:"Brake Rectifier Panel",rating:"415V AC → DC output",volt:"415V AC/DC",pop:1,make:"Per AVL",ref:"4410-132A",spare:1,pri:"HIGH",rem:"Outdoor; check diodes",uhf:false},
   {sno:3,eq:"15t DG EOT Crane",app:"DC Supply for DC Disc Brakes",comp:"Brake Rectifier Panel",rating:"415V AC → DC output",volt:"415V AC/DC",pop:1,make:"Per AVL",ref:"4410-001-301B",spare:1,pri:"HIGH",rem:"",uhf:false},
@@ -605,6 +696,122 @@ const vendors=[
   ["Control Relays","Siemens, Telemecanique, L&T — 3CO/11-pin socket type","110V AC coil; 3CO (DPCO) contacts; 11-pin socket base; keep 6 per rack system as buffer"],
 ];
 
+// ─── PAGINATION & STATE ────────────────────────────────────────────────────
+const PS=12;
+let mState={p:1,f:'',sort:{k:null,d:1}};
+let bState={p:1};let cState={p:1};let aState={p:1};
+
+function priB(p){const m={HIGH:'br',MEDIUM:'ba',LOW:'bg'};return`<span class="badge ${m[p]||'bt'}">${p}</span>`;}
+function priLed(p){return p==='HIGH'?'led-h':p==='MEDIUM'?'led-m':'led-l';}
+function filt(data,sid){const q=(document.getElementById(sid)||{value:''}).value.toLowerCase();return q?data.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(q))):data;}
+function pgRender(data,tbody,cnt,pgEl,prev,next,rowFn,state){
+  const total=data.length,start=(state.p-1)*PS,end=start+PS,rows=data.slice(start,end);
+  document.getElementById(tbody).innerHTML=rows.map(rowFn).join('');
+  document.getElementById(cnt).textContent=`${start+1}–${Math.min(end,total)} of ${total}`;
+  document.getElementById(pgEl).textContent=`Page ${state.p}/${Math.ceil(total/PS)||1}`;
+  document.getElementById(prev).disabled=state.p<=1;
+  document.getElementById(next).disabled=end>=total;
+}
+
+function renderMotors(){
+  let d=[...motors];
+  if(mState.f==='MH')d=d.filter(r=>r.type.includes('MH'));
+  else if(mState.f==='CT')d=d.filter(r=>r.type.includes('CT'));
+  else if(mState.f==='LT')d=d.filter(r=>r.type.includes('LT'));
+  else if(mState.f==='HIGH')d=d.filter(r=>r.pri==='HIGH');
+  else if(mState.f==='UHF')d=d.filter(r=>r.uhf);
+  else if(mState.f==='AHP')d=d.filter(r=>r.ahp);
+  const q=(document.getElementById('msrch')||{value:''}).value.toLowerCase();
+  if(q)d=d.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(q)));
+  if(mState.sort.k){const k=mState.sort.k,dr=mState.sort.d;d.sort((a,b)=>{const av=isNaN(a[k])?String(a[k]):+a[k],bv=isNaN(b[k])?String(b[k]):+b[k];return av<bv?-dr:av>bv?dr:0;});}
+  const total=d.length,start=(mState.p-1)*PS,end=start+PS,rows=d.slice(start,end);
+  const tc={MH:'bt',CT:'cb',LT:'cam'};
+  document.getElementById('mtbody').innerHTML=rows.map(r=>{
+    const t=r.type.includes('MH')?'bt':r.type.includes('CT')?'bb':'ba';
+    return`<tr class="${r.uhf?'uhf-row':r.ahp?'ahp-row':''}">
+      <td style="font-family:var(--mono);color:var(--text3)">${r.sno}</td>
+      <td style="font-weight:500">${r.eq}${r.uhf?' <span class="badge bb" style="font-size:8px">UHF</span>':''}${r.ahp?' <span class="badge bpu" style="font-size:8px">AHP</span>':''}</td>
+      <td style="color:var(--text2);font-size:10px">${r.app}</td>
+      <td><span class="badge ${t}">${r.type.replace('Motor–','')}</span></td>
+      <td style="font-family:var(--mono);color:var(--accent)">${r.kw}</td>
+      <td style="font-size:10px">${r.volt}</td>
+      <td style="font-size:10px">${r.poles}P / ${r.rpm}</td>
+      <td style="font-size:10px;color:var(--text2)">${r.duty}</td>
+      <td style="font-size:10px">${r.frame}</td>
+      <td style="font-family:var(--mono)">${r.pop}</td>
+      <td style="font-size:10px;color:var(--text2)">${r.make}</td>
+      <td style="font-family:var(--mono);color:var(--accent)">${r.spare}</td>
+      <td>${priB(r.pri)}</td>
+      <td style="font-size:10px;color:var(--text2)">${r.rem}</td>
+    </tr>`}).join('');
+  document.getElementById('mcnt').textContent=`${start+1}–${Math.min(end,total)} of ${total}`;
+  document.getElementById('mpg').textContent=`Page ${mState.p}/${Math.ceil(total/PS)||1}`;
+  document.getElementById('mprev').disabled=mState.p<=1;
+  document.getElementById('mnext').disabled=end>=total;
+}
+function mFilter(f){mState.f=f;mState.p=1;renderMotors();}
+function mPage(d){mState.p=Math.max(1,mState.p+d);renderMotors();}
+function sortM(k){if(mState.sort.k===k)mState.sort.d*=-1;else{mState.sort.k=k;mState.sort.d=1;}renderMotors();}
+
+function renderBrakes(){
+  const d=filt(brakes,'bsrch');
+  pgRender(d,'btbody','bcnt','bpg','bprev','bnext',r=>`<tr class="${r.uhf?'uhf-row':r.ahp?'ahp-row':''}">
+    <td style="font-family:var(--mono);color:var(--text3)">${r.sno}</td>
+    <td style="font-weight:500">${r.eq}${r.uhf?' <span class="badge bb" style="font-size:8px">UHF</span>':''}${r.ahp?' <span class="badge bpu" style="font-size:8px">AHP</span>':''}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.app}</td>
+    <td style="font-weight:500;font-size:11px">${r.type}</td>
+    <td><span class="badge ${r.cat.includes('Hoist')?'bt':r.cat.includes('LT')?'ba':'bb'}">${r.cat}</span></td>
+    <td style="font-family:var(--mono)">${r.size}</td>
+    <td style="font-family:var(--mono);color:var(--accent)">${r.torq}</td>
+    <td style="font-size:10px">${r.sf}</td>
+    <td style="font-family:var(--mono)">${r.pop}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.make}</td>
+    <td style="font-family:var(--mono);color:var(--accent)">${r.spare}</td>
+    <td>${priB(r.pri)}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.rem}</td>
+  </tr>`,bState);
+}
+function bPage(d){bState.p=Math.max(1,bState.p+d);renderBrakes();}
+
+function renderControl(){
+  const d=filt(controls,'csrch');
+  pgRender(d,'ctbody','ccnt','cpg','cprev','cnext',r=>`<tr class="${r.uhf?'uhf-row':''}">
+    <td style="font-family:var(--mono);color:var(--text3)">${r.sno}</td>
+    <td style="font-size:11px;font-weight:500">${r.eq}${r.uhf?' <span class="badge bb" style="font-size:8px">UHF</span>':''}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.app}</td>
+    <td style="font-weight:500">${r.comp}</td>
+    <td style="font-size:10px;color:var(--accent)">${r.rating}</td>
+    <td style="font-size:10px">${r.volt}</td>
+    <td><span class="badge bt" style="font-size:9px">${r.cat}</span></td>
+    <td style="font-family:var(--mono)">${r.pop}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.make}</td>
+    <td style="font-family:var(--mono);color:var(--accent)">${r.spare}</td>
+    <td>${priB(r.pri)}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.rem}</td>
+  </tr>`,cState);
+}
+function cPage(d){cState.p=Math.max(1,cState.p+d);renderControl();}
+
+function renderAux(){
+  const d=filt(auxiliaries,'asrch');
+  pgRender(d,'atbody','acnt','apg','aprev','anext',r=>`<tr class="${r.uhf?'uhf-row':''}">
+    <td style="font-family:var(--mono);color:var(--text3)">${r.sno}</td>
+    <td style="font-size:11px;font-weight:500">${r.eq}${r.uhf?' <span class="badge bb" style="font-size:8px">UHF</span>':''}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.app}</td>
+    <td style="font-weight:500">${r.comp}</td>
+    <td style="font-size:10px;color:var(--accent)">${r.rating}</td>
+    <td style="font-size:10px">${r.volt}</td>
+    <td style="font-family:var(--mono)">${r.pop}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.make}</td>
+    <td style="font-family:var(--mono);color:var(--accent)">${r.spare}</td>
+    <td>${priB(r.pri)}</td>
+    <td style="font-size:10px;color:var(--text2)">${r.rem}</td>
+  </tr>`,aState);
+}
+function aPage(d){aState.p=Math.max(1,aState.p+d);renderAux();}
+
+// ─── RACK VIEW ─────────────────────────────────────────────────────────────
+// ─── RACK VIEW ─────────────────────────────────────────────────────────────
 const rackCranes = [
   {name:"10t DG Gantry Crane",area:"Raw Water PH (Outdoor)",uhf:false,slots:[
     {n:"U01",c:"Main Isolating Switch",r:"100A, 3-pole",p:"HIGH"},
@@ -841,104 +1048,7 @@ function openRackModal(cIdx, sIdx) {
     "Priority": slot.p
   });
 }
-
-function renderMotors(){
-  let d=[...motors];
-  if(mState.f==='MH')d=d.filter(r=>r.type.includes('MH'));
-  else if(mState.f==='CT')d=d.filter(r=>r.type.includes('CT'));
-  else if(mState.f==='LT')d=d.filter(r=>r.type.includes('LT'));
-  else if(mState.f==='HIGH')d=d.filter(r=>r.pri==='HIGH');
-  else if(mState.f==='UHF')d=d.filter(r=>r.uhf);
-  else if(mState.f==='AHP')d=d.filter(r=>r.ahp);
-  const q=(document.getElementById('msrch')||{value:''}).value.toLowerCase();
-  if(q)d=d.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(q)));
-  if(mState.sort.k){const k=mState.sort.k,dr=mState.sort.d;d.sort((a,b)=>{const av=isNaN(a[k])?String(a[k]):+a[k],bv=isNaN(b[k])?String(b[k]):+b[k];return av<bv?-dr:av>bv?dr:0;});}
-  const total=d.length,start=(mState.p-1)*PS,end=start+PS,rows=d.slice(start,end);
-  const tc={MH:'bt',CT:'cb',LT:'cam'};
-  document.getElementById('mtbody').innerHTML=rows.map(r=>{
-    const t=r.type.includes('MH')?'bt':r.type.includes('CT')?'bb':'ba';
-    return`<tr class="${r.uhf?'uhf-row':r.ahp?'ahp-row':''}">
-      <td style="font-family:var(--mono);color:var(--text3)">${r.sno}</td>
-      <td style="font-weight:500">${r.eq}${r.uhf?' <span class="badge bb" style="font-size:8px">UHF</span>':''}${r.ahp?' <span class="badge bpu" style="font-size:8px">AHP</span>':''}</td>
-      <td style="color:var(--text2);font-size:10px">${r.app}</td>
-      <td><span class="badge ${t}">${r.type.replace('Motor–','')}</span></td>
-      <td style="font-family:var(--mono);color:var(--accent)">${r.kw}</td>
-      <td style="font-size:10px">${r.volt}</td>
-      <td style="font-size:10px">${r.poles}P / ${r.rpm}</td>
-      <td style="font-size:10px;color:var(--text2)">${r.duty}</td>
-      <td style="font-size:10px">${r.frame}</td>
-      <td style="font-family:var(--mono)">${r.pop}</td>
-      <td style="font-size:10px;color:var(--text2)">${r.make}</td>
-      <td style="font-family:var(--mono);color:var(--accent)">${r.spare}</td>
-      <td>${priB(r.pri)}</td>
-      <td style="font-size:10px;color:var(--text2)">${r.rem}</td>
-    </tr>`}).join('');
-  document.getElementById('mcnt').textContent=`${start+1}–${Math.min(end,total)} of ${total}`;
-  document.getElementById('mpg').textContent=`Page ${mState.p}/${Math.ceil(total/PS)||1}`;
-  document.getElementById('mprev').disabled=mState.p<=1;
-  document.getElementById('mnext').disabled=end>=total;
-}
-function mFilter(f){mState.f=f;mState.p=1;renderMotors();}
-function mPage(d){mState.p=Math.max(1,mState.p+d);renderMotors();}
-function sortM(k){if(mState.sort.k===k)mState.sort.d*=-1;else{mState.sort.k=k;mState.sort.d=1;}renderMotors();}
-
-function renderBrakes(){
-  const d=filt(brakes,'bsrch');
-  pgRender(d,'btbody','bcnt','bpg','bprev','bnext',r=>`<tr class="${r.uhf?'uhf-row':r.ahp?'ahp-row':''}">
-    <td style="font-family:var(--mono);color:var(--text3)">${r.sno}</td>
-    <td style="font-weight:500">${r.eq}${r.uhf?' <span class="badge bb" style="font-size:8px">UHF</span>':''}${r.ahp?' <span class="badge bpu" style="font-size:8px">AHP</span>':''}</td>
-    <td style="font-size:10px;color:var(--text2)">${r.app}</td>
-    <td style="font-weight:500;font-size:11px">${r.type}</td>
-    <td><span class="badge ${r.cat.includes('Hoist')?'bt':r.cat.includes('LT')?'ba':'bb'}">${r.cat}</span></td>
-    <td style="font-family:var(--mono)">${r.size}</td>
-    <td style="font-family:var(--mono);color:var(--accent)">${r.torq}</td>
-    <td style="font-size:10px">${r.sf}</td>
-    <td style="font-family:var(--mono)">${r.pop}</td>
-    <td style="font-size:10px;color:var(--text2)">${r.make}</td>
-    <td style="font-family:var(--mono);color:var(--accent)">${r.spare}</td>
-    <td>${priB(r.pri)}</td>
-    <td style="font-size:10px;color:var(--text2)">${r.rem}</td>
-  </tr>`,bState);
-}
-function bPage(d){bState.p=Math.max(1,bState.p+d);renderBrakes();}
-
-function renderControl(){
-  const d=filt(controls,'csrch');
-  pgRender(d,'ctbody','ccnt','cpg','cprev','cnext',r=>`<tr class="${r.uhf?'uhf-row':''}">
-    <td style="font-family:var(--mono);color:var(--text3)">${r.sno}</td>
-    <td style="font-size:11px;font-weight:500">${r.eq}${r.uhf?' <span class="badge bb" style="font-size:8px">UHF</span>':''}</td>
-    <td style="font-size:10px;color:var(--text2)">${r.app}</td>
-    <td style="font-weight:500">${r.comp}</td>
-    <td style="font-size:10px;color:var(--accent)">${r.rating}</td>
-    <td style="font-size:10px">${r.volt}</td>
-    <td><span class="badge bt" style="font-size:9px">${r.cat}</span></td>
-    <td style="font-family:var(--mono)">${r.pop}</td>
-    <td style="font-size:10px;color:var(--text2)">${r.make}</td>
-    <td style="font-family:var(--mono);color:var(--accent)">${r.spare}</td>
-    <td>${priB(r.pri)}</td>
-    <td style="font-size:10px;color:var(--text2)">${r.rem}</td>
-  </tr>`,cState);
-}
-function cPage(d){cState.p=Math.max(1,cState.p+d);renderControl();}
-
-function renderAux(){
-  const d=filt(auxiliaries,'asrch');
-  pgRender(d,'atbody','acnt','apg','aprev','anext',r=>`<tr class="${r.uhf?'uhf-row':''}">
-    <td style="font-family:var(--mono);color:var(--text3)">${r.sno}</td>
-    <td style="font-size:11px;font-weight:500">${r.eq}${r.uhf?' <span class="badge bb" style="font-size:8px">UHF</span>':''}</td>
-    <td style="font-size:10px;color:var(--text2)">${r.app}</td>
-    <td style="font-weight:500">${r.comp}</td>
-    <td style="font-size:10px;color:var(--accent)">${r.rating}</td>
-    <td style="font-size:10px">${r.volt}</td>
-    <td style="font-family:var(--mono)">${r.pop}</td>
-    <td style="font-size:10px;color:var(--text2)">${r.make}</td>
-    <td style="font-family:var(--mono);color:var(--accent)">${r.spare}</td>
-    <td>${priB(r.pri)}</td>
-    <td style="font-size:10px;color:var(--text2)">${r.rem}</td>
-  </tr>`,aState);
-}
-function aPage(d){aState.p=Math.max(1,aState.p+d);renderAux();}
-
+// ─── VENDORS TABLE ─────────────────────────────────────────────────────────
 function renderVendors(){
   document.getElementById('vendor-tbody').innerHTML=vendors.map((v,i)=>`<tr>
     <td style="font-family:var(--mono);color:var(--text3);width:24px">${i+1}</td>
@@ -948,6 +1058,7 @@ function renderVendors(){
   </tr>`).join('');
 }
 
+// ─── NAVIGATION ────────────────────────────────────────────────────────────
 function nav(p){
   document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
@@ -961,14 +1072,107 @@ function nav(p){
   if(p==='procurement')renderVendors();
 }
 
+// ─── MODAL ─────────────────────────────────────────────────────────────────
 function showMod(r){
-  document.getElementById('mod-title').textContent=r.comp||r.eq||r.type||r.Component||'Detail';
-  document.getElementById('mod-sub').textContent=r.app||r.cat||r.Target_Asset||'';
+  document.getElementById('mod-title').textContent=r.comp||r.eq||r.type||'Detail';
+  document.getElementById('mod-sub').textContent=r.app||r.cat||'';
   document.getElementById('mod-props').innerHTML=Object.entries(r).filter(([k,v])=>v&&v!=='—').map(([k,v])=>`<span class="pk">${k.replace(/_/g,' ')}</span><span class="pv">${v}</span>`).join('');
   document.getElementById('mod-bg').classList.add('open');
 }
 function closeMod(e){if(!e||e.target===document.getElementById('mod-bg'))document.getElementById('mod-bg').classList.remove('open');}
 
+// ─── AI EXPERT ─────────────────────────────────────────────────────────────
+let aiHist=[];
+async function sendAI(){
+  const inp=document.getElementById('ai-inp');
+  const txt=inp.value.trim();if(!txt)return;
+  inp.value='';addMsg('user',txt);
+  aiHist.push({role:'user',content:txt});
+  const tid=addTyping();
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:AI_CTX,messages:aiHist})
+    });
+    const data=await resp.json();
+    removeTyping(tid);
+    const reply=data.content?.[0]?.text||'Unable to get response. Please retry.';
+    addMsg('ai',reply);aiHist.push({role:'assistant',content:reply});
+    if(aiHist.length>20)aiHist=aiHist.slice(-20);
+  }catch(e){removeTyping(tid);addMsg('ai','Connection error. Check network and retry.');}
+}
+function sendQ(t){document.getElementById('ai-inp').value=t;sendAI();}
+function addMsg(role,txt){
+  const c=document.getElementById('ai-msgs'),d=document.createElement('div');
+  d.className='msg '+role;
+  const fmt=txt.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>');
+  d.innerHTML=`<div class="mav ${role}">${role==='ai'?'AI':'YOU'}</div><div class="mb">${fmt}</div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+let tc=0;
+function addTyping(){
+  const c=document.getElementById('ai-msgs'),id='typ-'+(++tc),d=document.createElement('div');
+  d.className='msg';d.id=id;
+  d.innerHTML=`<div class="mav ai">AI</div><div class="mb"><span class="tdot"></span><span class="tdot"></span><span class="tdot"></span></div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;return id;
+}
+function removeTyping(id){const e=document.getElementById(id);if(e)e.remove();}
+document.getElementById('ai-inp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAI();}});
+
+// ─── RCA GENERATOR ─────────────────────────────────────────────────────────
+function genRCA(){
+  const eq=document.getElementById('r-eq').value||'[Equipment]';
+  const tag=document.getElementById('r-tag').value||'[TAG]';
+  const dt=document.getElementById('r-date').value||new Date().toISOString().split('T')[0];
+  const type=document.getElementById('r-type').value;
+  const prob=document.getElementById('r-prob').value||'[Describe failure]';
+  const obs=document.getElementById('r-obs').value||'[Physical observations]';
+  const imp=document.getElementById('r-imp').value||'Under assessment';
+  const saf=document.getElementById('r-saf').value;
+  document.getElementById('rca-out').innerHTML=`<div class="tw" style="padding:16px;font-size:12px;line-height:1.8">
+    <div class="th" style="padding:0 0 10px;margin-bottom:14px"><h3>RCA Report — Template A</h3><span class="badge ba">${type}</span></div>
+    <div class="pg2">
+      <span class="pk">Equipment / System</span><span class="pv ca" style="font-family:var(--mono)">${eq} | ${tag}</span>
+      <span class="pk">Incident Date</span><span class="pv">${dt}</span>
+      <span class="pk">Failure Type</span><span class="pv">${type}</span>
+      <span class="pk">Problem Statement</span><span class="pv">${prob}</span>
+      <span class="pk">Initial Observations</span><span class="pv">${obs}</span>
+      <span class="pk">Immediate Containment</span><span class="pv">1. Issue LOTO / Positive Isolation — verify Zero Energy state (voltage, pressure, mechanical).<br>2. Notify shift in-charge & EMD control room.<br>3. Raise PTW & mobilize maintenance team.<br>4. Assess partial generation recovery on alternate equipment.</span>
+      <span class="pk">Root Cause (5-Why)</span><span class="pv">Why 1: <em>Failure symptom as reported.</em><br>Why 2: <em>Immediate physical cause (insulation breakdown, mechanical wear, overload).</em><br>Why 3: <em>Root technical trigger (coolant loss, vibration, contamination, VFD parameter mismatch).</em><br>Why 4: <em>Management gap (PM not executed, spare not procured, inspection missed).</em><br>Why 5: <em>System-level root cause (SOP gap, training deficit, vendor quality, design deficiency).</em></span>
+      <span class="pk">CAPA</span><span class="pv"><strong>Corrective:</strong> Replace failed component per correct spec (NTPC AVL). Conduct IR test pre-energisation. Re-commission per OEM checklist.<br><strong>Preventive:</strong> Update PM schedule. Raise PR for critical spare. Revise HIRA. Conduct DBT on identified hazard.</span>
+      <span class="pk">Safety Assessment</span><span class="pv"><span class="badge ${saf==='No Safety Incident'?'bg':'br'}">${saf}</span> | Generation Impact: ${imp}</span>
+    </div>
+    <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);font-family:var(--mono)">NTPC NKSTPP — EMD — DGM: Manash Kumar Mitra | IE Rules / CEA Regulations / NTPC Safety Policy</div>
+  </div>`;
+}
+
+// ─── PROCUREMENT TOOL ──────────────────────────────────────────────────────
+function genPR(){
+  const mat=document.getElementById('p-mat').value||'[Material]';
+  const asset=document.getElementById('p-asset').value;
+  const rsn=document.getElementById('p-rsn').value;
+  const stk=document.getElementById('p-stk').value||'NIL';
+  const qty=document.getElementById('p-qty').value||'TBD';
+  const tech=document.getElementById('p-tech').value||'[Technical justification]';
+  const risk=document.getElementById('p-risk').value||'[Risk if delayed]';
+  document.getElementById('pr-out').innerHTML=`<div class="tw" style="padding:16px;font-size:12px;line-height:1.8">
+    <div class="th" style="padding:0 0 10px;margin-bottom:14px"><h3>Procurement Justification — Template B</h3><span class="badge bg">${rsn}</span></div>
+    <div class="pg2">
+      <span class="pk">Material Description</span><span class="pv ca" style="font-weight:500">${mat}</span>
+      <span class="pk">Target Asset</span><span class="pv">${asset}</span>
+      <span class="pk">Reason</span><span class="pv">${rsn}</span>
+      <span class="pk">Current Inventory</span><span class="pv"><span class="badge ${stk==='NIL'||stk==='0'?'br':'ba'}">${stk}</span></span>
+      <span class="pk">Quantity Required</span><span class="pv" style="font-family:var(--mono)">${qty} nos.</span>
+      <span class="pk">Technical Justification</span><span class="pv">${tech}. Item must comply with NTPC AVL and meet OEM BOM/TDS specifications. Class F insulation minimum, IP55 protection, rated for S4 duty cycle, IE2/IE3 efficiency class as applicable.</span>
+      <span class="pk">Consequence of Non-Procurement</span><span class="pv"><span class="badge br">HIGH RISK</span> — ${risk}. Any generation loss at NKSTPP (3×660MW) has direct financial and PLF impact. Procurement delay directly threatens zero-downtime mandate of EMD department.</span>
+      <span class="pk">Compliance</span><span class="pv">IE Rules, CEA Regulations, NTPC Safety Policy, IS standards applicable to component category.</span>
+    </div>
+    <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);font-family:var(--mono)">NTPC NKSTPP — EMD — DGM: Manash Kumar Mitra | PSU Financial Prudence Guidelines</div>
+  </div>`;
+}
+
+// ─── EXPORT CSV ────────────────────────────────────────────────────────────
 function exportCSV(type){
   const data={motors}[type];if(!data)return;
   const keys=Object.keys(data[0]);
@@ -977,6 +1181,7 @@ function exportCSV(type){
   a.download=`EMD_${type}_NKSTPP_Rev2.csv`;a.click();
 }
 
+// ─── INIT ───────────────────────────────────────────────────────────────────
 renderMotors();
 </script>
 </body>
