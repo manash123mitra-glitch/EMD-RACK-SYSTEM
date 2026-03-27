@@ -393,8 +393,9 @@ CABLES: MH motor: 3C×4sq.mm Cu (large cranes), 3C×2.5sq.mm Cu (small). CT/LT: 
 SAFETY: LOTO (IS:13947), PTW (permit-to-work hot/cold), CEA Regulations, IE Rules 2016, NTPC Safety Policy, HIRA, JSA, DBT (Daily Toolbox Talk), Arc Flash PPE (CAT2 min), IS:3177/807/3938/325/1231/2266, crane classification Cl-II (M5) all cranes, load test 125% SWC. Emergency: 24×7 EMD control room, 112 emergency, fire tender.
 
 Always structure responses: Safety → Assessment → Technical Steps → Preventive Actions. For RCA use 5-Why. For procurement cite drawing reference and NTPC AVL compliance.`;
+</script>
 
-// ─── DATA ─────────────────────────────────────────────────────────────────
+<script>
 const motors=[
   {sno:1,eq:"2t Monorail Hoist",app:"APH/FOPH/PAFD Handling",type:"Motor–Hoist (MH)",kw:3.7,hp:5,volt:"415V 3Ph",poles:6,rpm:"920–960",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"112M",pop:1,make:"BBL/Siemens/Kirloskar/Crompton/Marathon",ref:"7100139820",spare:1,pri:"HIGH",rem:"112M frame; critical lifting",uhf:false},
   {sno:2,eq:"2t Monorail Hoist",app:"APH/FOPH/PAFD Handling",type:"Motor–Cross Travel (CT)",kw:0.55,hp:0.75,volt:"415V 3Ph",poles:4,rpm:"~1440",duty:"S4,150st/hr",enc:"TEFC IP55",ins:"Class F",frame:"90L",pop:1,make:"BBL/Siemens/Kirloskar/Crompton/Marathon",ref:"7100139820",spare:1,pri:"MEDIUM",rem:"Pool with 2.5t CT spare",uhf:false},
@@ -646,7 +647,6 @@ const auxiliaries=[
   {sno:18,eq:"All Control Panels",app:"Cable Entry",comp:"Cable Glands (IP55, assorted)",rating:"M16–M40, brass/nickel, 1100V",volt:"1100V grade",pop:"Req.",make:"Per AVL",ref:"All crane/hoist TDS",spare:20,pri:"LOW",rem:"Assorted M16/M20/M25/M32/M40",uhf:false},
   {sno:19,eq:"All Control Panels",app:"Conductor Termination",comp:"Cable Lugs & Ferrules (copper)",rating:"1.5–35mm², copper, DIN",volt:"1100V grade",pop:"Req.",make:"Per AVL",ref:"All crane/hoist TDS",spare:50,pri:"LOW",rem:"Keep 50 nos. assorted",uhf:false},
   {sno:20,eq:"All Control Panels",app:"Panel Earthing",comp:"Earthing Bus Bar & Earth Terminals",rating:"Copper busbar",volt:"—",pop:1,make:"Standard/AVL",ref:"All crane/hoist TDS",spare:2,pri:"LOW",rem:"1 spare busbar per panel type",uhf:false},
-  // UHF
   {sno:21,eq:"All UHF Cranes (×14)",app:"AC Supply for EM Disc Brakes",comp:"Brake Supply Panel (AC EM)",rating:"415V AC to AC EM brake coils",volt:"415V AC",pop:"1/crane",make:"Per AVL",ref:"ECD/USC-001 (UHF)",spare:1,pri:"HIGH",rem:"1 per crane; stock 1 common spare",uhf:true},
   {sno:22,eq:"25t Mill Crane DSL System",app:"Bus-Bar Power Feed",comp:"DSL (Conductix) Bus-Bar Track 30kW",rating:"30kW, 415V AC 3Ph 50Hz",volt:"415V AC 3Ph",pop:"Per layout",make:"Conductix/Universal/SFU-SIE/GE",ref:"DSL-004/005 (UHF)",spare:1,pri:"HIGH",rem:"30kW per supply point; confirm DSL model with UHF; critical power feed",uhf:true},
   {sno:23,eq:"25t USC-002 Festoon Cable",app:"CT Travel Power – Festoon",comp:"Festoon Cable + Trolley (UE-25)",rating:"JS:9968, 30M/2.5sq.mm×4c; SFU200A trolley",volt:"415V, 1100V grade",pop:6,make:"Universal/Polycab/SFU-SIE/GE",ref:"DSL-006/007 (UHF)",spare:2,pri:"HIGH",rem:"6 sets/crane; travel 12.5–15.5m; festoon cable = common fault",uhf:true},
@@ -656,7 +656,6 @@ const auxiliaries=[
   {sno:27,eq:"All UHF Control Panels",app:"Cable Entry – Double-Compression",comp:"Cable Glands IP55/IP56 Double-Compression",rating:"IP55/IP56, M16–M40 double-compression",volt:"1100V grade",pop:"Req.",make:"Per AVL",ref:"UHF/CP-001 (UHF)",spare:20,pri:"LOW",rem:"Double-compression type specified; keep M16/M20/M25/M32 assorted",uhf:true},
   {sno:28,eq:"25t Mill Crane DSL Track",app:"Fixed Power Supply Cable",comp:"Fixed DSL Supply Cable (6×length)",rating:"JS:9968, 30M/2.5sq.mm×4c; nylon rope insulator",volt:"415V, 1100V grade",pop:6,make:"Universal/Polycab",ref:"DSL-006 (UHF)",spare:1,pri:"MEDIUM",rem:"Fixed cable at each DSL point; inspect insulator/rope clamp",uhf:true},
   {sno:29,eq:"All UHF Cranes – E-Stop",app:"Emergency Stop on Pendant",comp:"E-Stop Pushbutton – UHF Pendant",rating:"40mm mushroom, NC, IP55; PP/ABS enclosure",volt:"110V AC",pop:1,make:"UHF/Siemens/Telemecanique",ref:"UHF/PB-001 (UHF)",spare:4,pri:"HIGH",rem:"Fitted to all UHF pendants; keep 4 standalone for damaged pendant replacement",uhf:true},
-  // ─── AHP AREA AUXILIARY (4410-162 | Reva cranes | from SLD/BOM drgs) ──────
   {sno:30,eq:"15t DG EOT Crane (HCSD PH)",app:"Under-Bridge Lighting",comp:"Under Bridge Lights (UBL1,UBL2)",rating:"150W/230V, HPSV lamp",volt:"230V AC",pop:2,make:"Per NTPC QAP AVL",ref:"4410-162-Y-016",spare:1,pri:"LOW",rem:"2 HPSV lamps under bridge; T2 lighting transformer supply",uhf:false,ahp:true},
   {sno:31,eq:"15t DG EOT Crane (HCSD PH)",app:"Panel Space Heater",comp:"Space Heater (SH1–SH4)",rating:"30W/230V with thermostat 30–110°C",volt:"230V AC",pop:4,make:"Per NTPC QAP AVL",ref:"4410-162-Y-016",spare:2,pri:"LOW",rem:"4 space heaters (PP+MH+CT+LT panels); thermostatic control",uhf:false,ahp:true},
   {sno:32,eq:"15t DG EOT Crane (HCSD PH)",app:"Panel Cooling Fan",comp:"Panel Cooling Fan (FAN1, FAN2)",rating:"230V, 2 nos.",volt:"230V AC",pop:2,make:"Per NTPC QAP AVL",ref:"4410-162-Y-016",spare:1,pri:"LOW",rem:"Forced ventilation for VFD panel cooling; 2 nos.",uhf:false,ahp:true},
@@ -696,7 +695,6 @@ const vendors=[
   ["Cable Glands","Per NTPC AVL — double-compression type for UHF panels","IP55/IP56; M16/M20/M25/M32/M40; nickel-plated brass for indoor; stock assorted 20 nos."],
   ["Control Relays","Siemens, Telemecanique, L&T — 3CO/11-pin socket type","110V AC coil; 3CO (DPCO) contacts; 11-pin socket base; keep 6 per rack system as buffer"],
 ];
-
 
 // ─── PAGINATION & STATE ────────────────────────────────────────────────────
 const PS=12;
@@ -1028,7 +1026,7 @@ function renderRack(){
       </div>
       <div class="ru-slots">
         ${crane.slots.map(s=>`
-          <div class="slot${crane.uhf?' uhf-slot':crane.ahp?' ahp-slot':''}">
+          <div class="slot${crane.uhf?' uhf-slot':crane.ahp?' ahp-slot':''}" onclick='showMod(${JSON.stringify({comp: s.c, app: crane.name, "Rating": s.r, "Priority": s.p, "Area": crane.area}).replace(/'/g, "&#39;")})'>
             <span class="snum">${s.n}</span>
             <span class="sled ${priLed(s.p)}"></span>
             <span class="sname">${s.c}</span>
