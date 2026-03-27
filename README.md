@@ -1,22 +1,43 @@
-# EMD Electrical Rack System — NTPC NKSTPP
+# EMD Rack System — Rev 3
+**NTPC North Karanpura STPP | 3×660MW | Electrical Maintenance Department**
+DGM: Manash Kumar Mitra
 
-**DGM Electrical Maintenance: Manash Kumar Mitra | Revision 2 | March 2026**
+## Revision 3 — March 2026
+Complete redesign sourced from ALL original NTPC TDS/BOM drawing extracted text files.
 
-AI-powered electrical spares procurement & rack management system for NTPC North Karanpura Super Thermal Power Project.
+### Source Documents Processed
+| Drawing No. | Description | Vendor |
+|---|---|---|
+| 4410-001-102-PVM-Y-017 | 35t Consolidated Hoist | CGL India |
+| 4410-001-110-PVM-Y-010 | 15t CEP Under-Slung Crane | Reva / Yaskawa V1000 |
+| 4410-001-301B-PVM-W-027 | 15t DG EOT Crane (Intake Well) | Reva |
+| 4410-132A-PVM-Y-024 | 10t DG Gantry Crane (Raw Water PH) | Reva |
+| 7100139820 | 2t–10t Monorail Hoists | UHF Thane |
+| 7100139821 | 17.5t & 20t Under-Hung TWH | UHF Thane |
+| 4410-001-110-PVM-B-028 | 2t & 5t Wire Rope Hoists | Century |
+| 4410-001-110-PVM-B-122 | 3t Elevator MR Hoist | Mangla |
+| 4410-001-110-PVM-Y-250 | BFP Monorail Hoist | Alpha Svcs / Yaskawa A1000 |
+| 4410-001-110-PVM-Y-251 | 30t Permanent Store EOT Crane | Alpha Svcs / Yaskawa A1000 |
+| 4410-162-PVM-Y-016 | AHP Area: 15t HCSD, 7.5t TAC, 5t Ash, 3t Silo | Reva / LHP |
+| NORTH_KARANPURA_7 | UHF Mill Cranes USC-001/002 EH-003/012 | UHF Thane |
 
-## Features
-- 162 line items | 297 installed population | 199 recommended spares
-- Motor Database (35 items — NTPC + UHF Mill Cranes)
-- Brake Systems (39 items — DC EM / AC EM / AC EHT)
-- Control Components (64 items — VFDs, contactors, fuses, limit switches)
-- Auxiliary & Drive (29 items — DSL system, festoon cables, UHF interlocks)
-- Visual Rack View (8 crane/hoist assemblies)
-- Procurement Summary & Vendor Shortlist
-- AI Technical Expert (Claude Sonnet 4)
-- RCA Generator (Template A)
-- Procurement Justification (Template B)
+### Features
+- **55 Motor entries** (BBL / LHP / CGL / ABB / Siemens)
+- **69 Brake entries** (DC Disc Pethe/EMCO, AC EHT Electromag, AC EM)
+- **100+ Control component entries** (from actual SLD/BOM drawings)
+- **36 Auxiliary entries** (rectifiers, drives, DSL, fans, heaters)
+- **175 Rack view slots** across 17 crane/hoist types
+- **27 Vendor entries** (drawing-referenced)
+- **AI Expert** with full site context (Claude Sonnet — requires internet)
 
-## Sources
-1. NTPC Approved TDS/BOM: 7100139820, 7100139821, Century/Reva/CGL/BBL/Mangla
-2. UHF Drawing Package: NORTH_KARANPURA__7__230724_152728.pdf (Universal Hoist-O-Fabrik)
-3. Want to create procurement plan
+### GitHub Pages Setup
+1. Upload all 3 files (`index.html`, `.nojekyll`, `README.md`) to repo root
+2. Settings → Pages → Source: `main` branch → `/ (root)` → Save
+3. Visit: `https://<username>.github.io/<repo-name>/`
+
+### Colour Coding
+- **Purple badge (AHP)** — AHP area cranes (4410-162 Reva series)
+- **Blue badge (UHF)** — UHF Mill Cranes (Universal Hoist-O-Fabrik)
+- **Red badge** — HIGH priority procurement
+- **Amber badge** — MEDIUM priority
+
